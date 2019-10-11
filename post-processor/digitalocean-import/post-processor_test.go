@@ -1,4 +1,4 @@
-package dockerimport
+package digitaloceanimport
 
 import (
 	"bytes"
