@@ -25,6 +25,25 @@ import is complete.
 For information about the requirements to use an image for a DigitalOcean
 Droplet, see DigitalOcean's [Custom Images documentation](https://www.digitalocean.com/docs/images/custom-images).
 
+### Installation
+
+To install this plugin using Packer v1.7.0 or later, copy and paste this code
+into your Packer configuration.
+
+Then, run [`packer init`](https://www.packer.io/docs/commands/init).
+
+
+```hcl
+packer {
+  required_plugins {
+    digitalocean = {
+      version = ">= 0.0.1"
+      source  = "github.com/hashicorp/digitalocean"
+    }
+  }
+}
+```
+
 ## Configuration
 
 There are some configuration options available for the post-processor.
