@@ -67,6 +67,7 @@ access tokens:
 
 <Tabs>
 <Tab heading="HCL2">
+
 ```hcl
 source "digitalocean" "example" {
   api_token    = "YOUR API KEY"
@@ -79,9 +80,12 @@ source "digitalocean" "example" {
 build {
   sources = ["source.digitalocean.example"]
 }
+
 ```
+
 </Tab>
 <Tab heading="JSON">
+
 ```json
 {
   "type": "digitalocean",
@@ -92,6 +96,7 @@ build {
   "ssh_username": "root"
 }
 ```
+
 </Tab>
 <Tabs>
 
