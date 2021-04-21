@@ -27,7 +27,7 @@ var (
 
 func main() {
 	pps := plugin.NewSet()
-	pps.RegisterBuilder(plugin.DefaultName, new(digitalocean.Builder))
+	pps.RegisterBuilder(plugin.DEFAULT_NAME, new(digitalocean.Builder))
 	pps.RegisterPostProcessor("import", new(digitaloceanPP.PostProcessor))
 	pps.SetVersion(PluginVersion)
 	err := pps.Run()
