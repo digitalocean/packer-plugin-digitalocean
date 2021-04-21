@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/packer-plugin-digitalocean/builder/digitalocean"
-	digitaloceanPP "github.com/hashicorp/packer-plugin-digitalocean/post-processor/digitalocean"
+	digitaloceanPP "github.com/hashicorp/packer-plugin-digitalocean/post-processor/digitalocean-import"
 
 	"github.com/hashicorp/packer-plugin-sdk/plugin"
 	"github.com/hashicorp/packer-plugin-sdk/version"
