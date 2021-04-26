@@ -197,14 +197,14 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
 	// Check if the PrivateNetworking is enabled by user before use VPC UUID
 	if c.VPCUUID != "" {
-		if c.PrivateNetworking != true {
+		if !c.PrivateNetworking {
 			errs = packersdk.MultiErrorAppend(errs, errors.New("private networking should be enabled to use vpc_uuid"))
 		}
 	}
 
 	// Check if the PrivateNetworking is enabled by user before use ConnectWithPrivateIP
 	if c.ConnectWithPrivateIP == true {
-		if c.PrivateNetworking != true {
+		if !c.PrivateNetworking {
 			errs = packersdk.MultiErrorAppend(errs, errors.New("private networking should be enabled to use connect_with_private_ip"))
 		}
 	}
