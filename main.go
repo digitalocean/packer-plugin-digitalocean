@@ -1,4 +1,4 @@
-git tagpackage main
+package main
 
 import (
 	"fmt"
