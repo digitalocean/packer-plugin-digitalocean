@@ -203,7 +203,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	}
 
 	// Check if the PrivateNetworking is enabled by user before use ConnectWithPrivateIP
-	if c.ConnectWithPrivateIP == true {
+	if c.ConnectWithPrivateIP {
 		if !c.PrivateNetworking {
 			errs = packersdk.MultiErrorAppend(errs, errors.New("private networking should be enabled to use connect_with_private_ip"))
 		}
