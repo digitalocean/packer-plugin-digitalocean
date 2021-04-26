@@ -26,6 +26,8 @@ type Builder struct {
 	runner multistep.Runner
 }
 
+var _ packersdk.Builder = new(Builder)
+
 func (b *Builder) ConfigSpec() hcldec.ObjectSpec { return b.config.FlatMapstructure().HCL2Spec() }
 
 func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {

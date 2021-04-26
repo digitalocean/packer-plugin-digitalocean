@@ -4,8 +4,6 @@ import (
 	"strconv"
 	"testing"
 	"time"
-
-	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 )
 
 func testConfig() map[string]interface{} {
@@ -15,14 +13,6 @@ func testConfig() map[string]interface{} {
 		"size":         "512mb",
 		"ssh_username": "root",
 		"image":        "foo",
-	}
-}
-
-func TestBuilder_ImplementsBuilder(t *testing.T) {
-	var raw interface{}
-	raw = &Builder{}
-	if _, ok := raw.(packersdk.Builder); !ok {
-		t.Fatalf("Builder should be a builder")
 	}
 }
 
