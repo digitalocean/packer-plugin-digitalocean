@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/digitalocean/godo"
+	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 )
 
 type Artifact struct {
@@ -27,6 +28,8 @@ type Artifact struct {
 	// to be shared with post-processors
 	StateData map[string]interface{}
 }
+
+var _ packersdk.Artifact = new(Artifact)
 
 func (*Artifact) BuilderId() string {
 	return BuilderId

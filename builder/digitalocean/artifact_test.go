@@ -2,20 +2,10 @@ package digitalocean
 
 import (
 	"testing"
-
-	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 )
 
 func generatedData() map[string]interface{} {
 	return make(map[string]interface{})
-}
-
-func TestArtifact_Impl(t *testing.T) {
-	var raw interface{}
-	raw = &Artifact{}
-	if _, ok := raw.(packersdk.Artifact); !ok {
-		t.Fatalf("Artifact should be artifact")
-	}
 }
 
 func TestArtifactId(t *testing.T) {
