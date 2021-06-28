@@ -21,7 +21,19 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	client := state.Get("client").(*godo.Client)
 	ui := state.Get("ui").(packersdk.Ui)
 	c := state.Get("config").(*Config)
-	sshKeyId := state.Get("ssh_key_id").(int)
+
+	sshKeys := []godo.DropletCreateSSHKey{}
+	sshKeyId, hasSSHkey := state.GetOk("ssh_key_id")
+	if hasSSHkey {
+		sshKeys = append(sshKeys, godo.DropletCreateSSHKey{
+			ID: sshKeyId.(int),
+		})
+	}
+	if c.SSHKeyID != 0 {
+		sshKeys = append(sshKeys, godo.DropletCreateSSHKey{
+			ID: c.SSHKeyID,
+		})
+	}
 
 	// Create the droplet based on configuration
 	ui.Say("Creating droplet...")
@@ -40,13 +52,11 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	createImage := getImageType(c.Image)
 
 	dropletCreateReq := &godo.DropletCreateRequest{
-		Name:   c.DropletName,
-		Region: c.Region,
-		Size:   c.Size,
-		Image:  createImage,
-		SSHKeys: []godo.DropletCreateSSHKey{
-			{ID: sshKeyId},
-		},
+		Name:              c.DropletName,
+		Region:            c.Region,
+		Size:              c.Size,
+		Image:             createImage,
+		SSHKeys:           sshKeys,
 		PrivateNetworking: c.PrivateNetworking,
 		Monitoring:        c.Monitoring,
 		IPv6:              c.IPv6,
