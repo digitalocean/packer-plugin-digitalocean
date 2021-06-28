@@ -21,7 +21,11 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	client := state.Get("client").(*godo.Client)
 	ui := state.Get("ui").(packersdk.Ui)
 	c := state.Get("config").(*Config)
-	sshKeyId := state.Get("ssh_key_id").(int)
+
+	sshKeyId := c.SSHKeyID
+	if sshKeyId == 0 {
+		sshKeyId = state.Get("ssh_key_id").(int)
+	}
 
 	// Create the droplet based on configuration
 	ui.Say("Creating droplet...")

@@ -31,7 +31,13 @@ var _ packersdk.Builder = new(Builder)
 func (b *Builder) ConfigSpec() hcldec.ObjectSpec { return b.config.FlatMapstructure().HCL2Spec() }
 
 func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
+
 	warnings, errs := b.config.Prepare(raws...)
+	if (b.config.SSHPrivateKeyFile != "" && b.config.SSHKeyID == 0) ||
+		(b.config.SSHPrivateKeyFile == "" && b.config.SSHKeyID != 0) {
+		errs = packersdk.MultiErrorAppend(errs,
+			fmt.Errorf("Both `ssh_key_id` and `ssh_private_key_file` must be set when one is."))
+	}
 	if errs != nil {
 		return nil, warnings, errs
 	}

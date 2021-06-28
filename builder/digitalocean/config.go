@@ -93,6 +93,13 @@ type Config struct {
 	// it is at behind a firewall, then communicators should use the private IP
 	// instead of the public IP. Before using this, private_networking should be enabled.
 	ConnectWithPrivateIP bool `mapstructure:"connect_with_private_ip" required:"false"`
+	// The ID of an existing SSH key on the DigitalOcean account. This should be
+	// used in conjunction with `ssh_private_key_file`. When excluded, an SSH key
+	// will be automatically generated and used to build the image.
+	SSHKeyID int `mapstructure:"ssh_key_id" required:"false"`
+	// The path to an SSH private key file cooresponding to an SSH public key on
+	// a DigitalOcean account. This should be used in conjunction with `ssh_key_id`.
+	SSHPrivateKeyFile string `mapstructure:"ssh_private_key_file" required:"false"`
 
 	ctx interpolate.Context
 }
