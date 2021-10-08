@@ -33,16 +33,16 @@ type Config struct {
 	// The name (or slug) of the region to launch the droplet
 	// in. Consequently, this is the region where the snapshot will be available.
 	// See
-	// https://developers.digitalocean.com/documentation/v2/#list-all-regions
+	// https://docs.digitalocean.com/reference/api/api-reference/#operation/list_all_regions
 	// for the accepted region names/slugs.
 	Region string `mapstructure:"region" required:"true"`
 	// The name (or slug) of the droplet size to use. See
-	// https://developers.digitalocean.com/documentation/v2/#list-all-sizes
+	// https://docs.digitalocean.com/reference/api/api-reference/#operation/list_all_sizes
 	// for the accepted size names/slugs.
 	Size string `mapstructure:"size" required:"true"`
 	// The name (or slug) of the base image to use. This is the
 	// image that will be used to launch a new droplet and provision it. See
-	// https://developers.digitalocean.com/documentation/v2/#list-all-images
+	// https://docs.digitalocean.com/reference/api/api-reference/#operation/get_images_list
 	// for details on how to get a list of the accepted image names/slugs.
 	Image string `mapstructure:"image" required:"true"`
 	// Set to true to enable private networking
