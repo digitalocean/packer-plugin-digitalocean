@@ -123,7 +123,10 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	// Defaults
 	if c.APIToken == "" {
 		// Default to environment variable for api_token, if it exists
-		c.APIToken = os.Getenv("DIGITALOCEAN_API_TOKEN")
+		c.APIToken = os.Getenv("DIGITALOCEAN_TOKEN")
+		if c.APIToken == "" {
+			c.APIToken = os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
+		}
 	}
 	if c.APIURL == "" {
 		c.APIURL = os.Getenv("DIGITALOCEAN_API_URL")
