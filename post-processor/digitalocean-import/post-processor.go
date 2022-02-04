@@ -97,7 +97,10 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 	}
 
 	if p.config.APIToken == "" {
-		p.config.APIToken = os.Getenv("DIGITALOCEAN_API_TOKEN")
+		p.config.APIToken = os.Getenv("DIGITALOCEAN_TOKEN")
+		if p.config.APIToken == "" {
+			p.config.APIToken = os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
+		}
 	}
 
 	if p.config.ObjectName == "" {
