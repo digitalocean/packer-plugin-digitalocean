@@ -23,7 +23,7 @@ type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 	Comm                communicator.Config `mapstructure:",squash"`
 	// The client TOKEN to use to access your account. It
-	// can also be specified via environment variable DIGITALOCEAN_API_TOKEN, if
+	// can also be specified via environment variable DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN, if
 	// set.
 	APIToken string `mapstructure:"api_token" required:"true"`
 	// Non standard api endpoint URL. Set this if you are
