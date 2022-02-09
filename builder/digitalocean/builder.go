@@ -41,6 +41,10 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 		return nil, warnings, errs
 	}
 
+	if len(warnings) > 0 {
+		return nil, warnings, nil
+	}
+
 	return nil, nil, nil
 }
 
