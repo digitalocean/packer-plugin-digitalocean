@@ -26,8 +26,6 @@ type Config struct {
 	// can also be specified via environment variable DIGITALOCEAN_TOKEN, DIGITALOCEAN_ACCESS_TOKEN, or DIGITALOCEAN_API_TOKEN if
 	// set. DIGITALOCEAN_API_TOKEN will be deprecated in a future release in favor of DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN.
 	APIToken string `mapstructure:"api_token" required:"true"`
-	// DepToken is a flag denoting the use of the deprecated API token ENV VAR
-	depToken bool
 	// Non standard api endpoint URL. Set this if you are
 	// using a DigitalOcean API compatible service. It can also be specified via
 	// environment variable DIGITALOCEAN_API_URL.
@@ -135,7 +133,6 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		}
 		if c.APIToken == "" {
 			c.APIToken = os.Getenv("DIGITALOCEAN_API_TOKEN")
-			c.depToken = true
 			warns = append(warns, "The DIGITALOCEAN_API_TOKEN environment variable is deprecated "+
 				"and will produce an error in future versions of the DigitalOcean Packer plugin. "+
 				"Please use either DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN moving forward.")

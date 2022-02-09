@@ -43,6 +43,9 @@ func testAccPreCheck(t *testing.T) bool {
 		v = os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
 	}
 	if v == "" {
+		v = os.Getenv("DIGITALOCEAN_API_TOKEN")
+	}
+	if v == "" {
 		t.Fatal("DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN must be set for acceptance tests")
 		return true
 	}
