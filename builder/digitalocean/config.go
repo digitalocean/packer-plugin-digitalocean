@@ -133,9 +133,11 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		}
 		if c.APIToken == "" {
 			c.APIToken = os.Getenv("DIGITALOCEAN_API_TOKEN")
-			warns = append(warns, "The DIGITALOCEAN_API_TOKEN environment variable is deprecated "+
-				"and will produce an error in future versions of the DigitalOcean Packer plugin. "+
-				"Please use either DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN moving forward.")
+			if c.APIToken != "" {
+				warns = append(warns, "The DIGITALOCEAN_API_TOKEN environment variable is deprecated "+
+					"and will produce an error in future versions of the DigitalOcean Packer plugin. "+
+					"Please use either DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN moving forward.")
+			}
 		}
 	}
 	if c.APIURL == "" {
