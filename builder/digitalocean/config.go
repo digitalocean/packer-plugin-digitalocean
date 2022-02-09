@@ -23,9 +23,11 @@ type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 	Comm                communicator.Config `mapstructure:",squash"`
 	// The client TOKEN to use to access your account. It
-	// can also be specified via environment variable DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN, if
-	// set.
+	// can also be specified via environment variable DIGITALOCEAN_TOKEN, DIGITALOCEAN_ACCESS_TOKEN, or DIGITALOCEAN_API_TOKEN if
+	// set. DIGITALOCEAN_API_TOKEN will be deprecated in a future release in favor of DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN.
 	APIToken string `mapstructure:"api_token" required:"true"`
+	// DepToken is a flag denoting the use of the deprecated API token ENV VAR
+	depToken bool
 	// Non standard api endpoint URL. Set this if you are
 	// using a DigitalOcean API compatible service. It can also be specified via
 	// environment variable DIGITALOCEAN_API_URL.
@@ -105,6 +107,10 @@ type Config struct {
 
 func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
+	// Accumulate warnings and errors
+	var errs *packersdk.MultiError
+	var warns []string
+
 	var md mapstructure.Metadata
 	err := config.Decode(c, &config.DecodeOpts{
 		Metadata:           &md,
@@ -126,6 +132,13 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		c.APIToken = os.Getenv("DIGITALOCEAN_TOKEN")
 		if c.APIToken == "" {
 			c.APIToken = os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
+		}
+		if c.APIToken == "" {
+			c.APIToken = os.Getenv("DIGITALOCEAN_API_TOKEN")
+			c.depToken = true
+			warns = append(warns, "The DIGITALOCEAN_API_TOKEN environment variable is deprecated "+
+				"and will produce an error in future versions of the DigitalOcean Packer plugin. "+
+				"Please use either DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN moving forward.")
 		}
 	}
 	if c.APIURL == "" {
@@ -156,8 +169,6 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		// Default to 60 minutes timeout, waiting for snapshot action to finish
 		c.SnapshotTimeout = 60 * time.Minute
 	}
-
-	var errs *packersdk.MultiError
 
 	if es := c.Comm.Prepare(&c.ctx); len(es) > 0 {
 		errs = packersdk.MultiErrorAppend(errs, es...)
@@ -219,9 +230,9 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	}
 
 	if errs != nil && len(errs.Errors) > 0 {
-		return nil, errs
+		return warns, errs
 	}
 
 	packersdk.LogSecretFilter.Set(c.APIToken)
-	return nil, nil
+	return warns, nil
 }

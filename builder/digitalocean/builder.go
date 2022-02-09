@@ -56,6 +56,12 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		client.BaseURL = u
 	}
 
+	if b.config.depToken {
+		ui.Say("[WARN] The DIGITALOCEAN_API_TOKEN environment variable is deprecated " +
+			"and will produce an error in future versions of the DigitalOcean Packer plugin. " +
+			"Please use either DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN moving forward.")
+	}
+
 	if len(b.config.SnapshotRegions) > 0 {
 		opt := &godo.ListOptions{
 			Page:    1,
