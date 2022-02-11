@@ -9,6 +9,7 @@ import (
 
 	"github.com/digitalocean/godo"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
+	registryimage "github.com/hashicorp/packer-plugin-sdk/packer/registry/image"
 )
 
 type Artifact struct {
@@ -49,6 +50,9 @@ func (a *Artifact) String() string {
 }
 
 func (a *Artifact) State(name string) interface{} {
+	if name == registryimage.ArtifactStateURI {
+		return a.stateHCPPackerRegistryMetadata()
+	}
 	return a.StateData[name]
 }
 
@@ -56,4 +60,24 @@ func (a *Artifact) Destroy() error {
 	log.Printf("Destroying image: %d (%s)", a.SnapshotId, a.SnapshotName)
 	_, err := a.Client.Images.Delete(context.TODO(), a.SnapshotId)
 	return err
+}
+
+func (a *Artifact) stateHCPPackerRegistryMetadata() interface{} {
+	var sourceID string
+	var region string
+	sourceImageID, ok := a.StateData["source_image_id"].(string)
+	if ok {
+		sourceID = sourceImageID
+	}
+	reg, ok := a.StateData["region"].(string)
+	if ok {
+		region = reg
+	}
+	img, _ := registryimage.FromArtifact(a,
+		registryimage.WithSourceID(sourceID),
+		registryimage.WithID(a.SnapshotName),
+		registryimage.WithProvider("DigitalOcean"),
+		registryimage.WithRegion(region),
+	)
+	return img
 }
