@@ -38,8 +38,15 @@ func testAccPreCheck(t *testing.T) bool {
 			acctest.TestEnvVar))
 		return true
 	}
-	if v := os.Getenv("DIGITALOCEAN_API_TOKEN"); v == "" {
-		t.Fatal("DIGITALOCEAN_API_TOKEN must be set for acceptance tests")
+	v := os.Getenv("DIGITALOCEAN_TOKEN")
+	if v == "" {
+		v = os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
+	}
+	if v == "" {
+		v = os.Getenv("DIGITALOCEAN_API_TOKEN")
+	}
+	if v == "" {
+		t.Fatal("DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN must be set for acceptance tests")
 		return true
 	}
 	return false
@@ -47,7 +54,10 @@ func testAccPreCheck(t *testing.T) bool {
 
 func makeTemplateWithImageId(t *testing.T) string {
 	if os.Getenv(acctest.TestEnvVar) != "" {
-		token := os.Getenv("DIGITALOCEAN_API_TOKEN")
+		token := os.Getenv("DIGITALOCEAN_TOKEN")
+		if token == "" {
+			token = os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
+		}
 		client := godo.NewClient(oauth2.NewClient(context.TODO(), &apiTokenSource{
 			AccessToken: token,
 		}))
