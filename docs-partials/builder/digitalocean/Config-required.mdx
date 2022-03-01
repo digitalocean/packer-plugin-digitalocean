@@ -1,8 +1,8 @@
 <!-- Code generated from the comments of the Config struct in builder/digitalocean/config.go; DO NOT EDIT MANUALLY -->
 
 - `api_token` (string) - The client TOKEN to use to access your account. It
-  can also be specified via environment variable DIGITALOCEAN_API_TOKEN, if
-  set.
+  can also be specified via environment variable DIGITALOCEAN_TOKEN, DIGITALOCEAN_ACCESS_TOKEN, or DIGITALOCEAN_API_TOKEN if
+  set. DIGITALOCEAN_API_TOKEN will be deprecated in a future release in favor of DIGITALOCEAN_TOKEN or DIGITALOCEAN_ACCESS_TOKEN.
 
 - `region` (string) - The name (or slug) of the region to launch the droplet
   in. Consequently, this is the region where the snapshot will be available.
