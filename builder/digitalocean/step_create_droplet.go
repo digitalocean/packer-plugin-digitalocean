@@ -50,9 +50,12 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	}
 
 	createImage := getImageType(c.Image)
-	// Store the source image ID for HCP Packer
+
+	// Store the source image ID and
+	// other miscellaneous info for HCP Packer
 	state.Put("source_image_id", c.Image)
-	// Store the primary region for HCP Packer
+	state.Put("droplet_size", c.Size)
+	state.Put("droplet_name", c.DropletName)
 	state.Put("region", c.Region)
 
 	dropletCreateReq := &godo.DropletCreateRequest{

@@ -135,7 +135,13 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		SnapshotId:   state.Get("snapshot_image_id").(int),
 		RegionNames:  state.Get("regions").([]string),
 		Client:       client,
-		StateData:    map[string]interface{}{"generated_data": state.Get("generated_data")},
+		StateData: map[string]interface{}{
+			"generated_data":  state.Get("generated_data"),
+			"source_image_id": state.Get("source_image_id"),
+			"droplet_size":    state.Get("droplet_size"),
+			"droplet_name":    state.Get("droplet_name"),
+			"region":          state.Get("region"),
+		},
 	}
 
 	return artifact, nil
