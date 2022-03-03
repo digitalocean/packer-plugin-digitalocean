@@ -140,7 +140,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 			"source_image_id": state.Get("source_image_id"),
 			"droplet_size":    state.Get("droplet_size"),
 			"droplet_name":    state.Get("droplet_name"),
-			"region":          state.Get("region"),
+			"build_region":    state.Get("build_region"),
 		},
 	}
 

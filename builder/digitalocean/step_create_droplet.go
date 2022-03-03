@@ -56,7 +56,7 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	state.Put("source_image_id", c.Image)
 	state.Put("droplet_size", c.Size)
 	state.Put("droplet_name", c.DropletName)
-	state.Put("region", c.Region)
+	state.Put("build_region", c.Region)
 
 	dropletCreateReq := &godo.DropletCreateRequest{
 		Name:              c.DropletName,

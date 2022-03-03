@@ -64,7 +64,7 @@ func (a *Artifact) Destroy() error {
 
 func (a *Artifact) stateHCPPackerRegistryMetadata() interface{} {
 	// declare slice of images to be filled by the loop
-	images := []*registryimage.Image{}
+	images := make([]*registryimage.Image, 0, len(a.RegionNames))
 	// iterate over the regions names and create image metadata for each
 	for _, region := range a.RegionNames {
 		labels := make(map[string]string)
@@ -78,9 +78,9 @@ func (a *Artifact) stateHCPPackerRegistryMetadata() interface{} {
 			labels["source_image_id"] = sourceID
 		}
 		// Get and set the region information
-		region, ok = a.StateData["region"].(string)
+		buildRegion, ok := a.StateData["build_region"].(string)
 		if ok {
-			labels["region"] = region
+			labels["build_region"] = buildRegion
 		}
 		// Get and set droplet size
 		drpSize, ok = a.StateData["droplet_size"].(string)
@@ -92,7 +92,7 @@ func (a *Artifact) stateHCPPackerRegistryMetadata() interface{} {
 		if ok {
 			labels["droplet_name"] = drpName
 		}
-		// instantiate
+		// instantiate the image
 		img, err := registryimage.FromArtifact(a,
 			registryimage.WithSourceID(sourceID),
 			registryimage.WithID(a.SnapshotName),
