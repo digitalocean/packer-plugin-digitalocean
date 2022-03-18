@@ -104,14 +104,14 @@ func TestArtifactState_hcpPackerRegistryMetadata(t *testing.T) {
 	expected := []registryimage.Image{
 		{
 			ImageID:        "12345",
-			ProviderName:   "DigitalOcean",
+			ProviderName:   "digitalocean",
 			ProviderRegion: "nyc1",
 			SourceImageID:  "centos-stream-8-x64",
 			Labels:         map[string]string{"source_image_id": "centos-stream-8-x64"},
 		},
 		{
 			ImageID:        "12345",
-			ProviderName:   "DigitalOcean",
+			ProviderName:   "digitalocean",
 			ProviderRegion: "nyc3",
 			SourceImageID:  "centos-stream-8-x64",
 			Labels:         map[string]string{"source_image_id": "centos-stream-8-x64"},
