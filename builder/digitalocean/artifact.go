@@ -96,7 +96,7 @@ func (a *Artifact) stateHCPPackerRegistryMetadata() interface{} {
 		img, err := registryimage.FromArtifact(a,
 			registryimage.WithSourceID(sourceID),
 			registryimage.WithID(strconv.Itoa(a.SnapshotId)),
-			registryimage.WithProvider("DigitalOcean"),
+			registryimage.WithProvider("digitalocean"),
 			registryimage.WithRegion(region),
 		)
 		if err != nil {
