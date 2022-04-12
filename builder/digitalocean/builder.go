@@ -11,10 +11,12 @@ import (
 
 	"github.com/digitalocean/godo"
 	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/hashicorp/packer-plugin-digitalocean/version"
 	"github.com/hashicorp/packer-plugin-sdk/communicator"
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/multistep/commonsteps"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
+	"github.com/hashicorp/packer-plugin-sdk/useragent"
 	"golang.org/x/oauth2"
 )
 
@@ -48,6 +50,8 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	client := godo.NewClient(oauth2.NewClient(context.TODO(), &apiTokenSource{
 		AccessToken: b.config.APIToken,
 	}))
+	client.UserAgent = useragent.String(version.PluginVersion.FormattedVersion())
+
 	if b.config.APIURL != "" {
 		u, err := url.Parse(b.config.APIURL)
 		if err != nil {
