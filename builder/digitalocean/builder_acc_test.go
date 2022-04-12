@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	"github.com/digitalocean/godo"
+	"github.com/hashicorp/packer-plugin-digitalocean/version"
 	"github.com/hashicorp/packer-plugin-sdk/acctest"
+	"github.com/hashicorp/packer-plugin-sdk/useragent"
 	"golang.org/x/oauth2"
 )
 
@@ -58,9 +60,16 @@ func makeTemplateWithImageId(t *testing.T) string {
 		if token == "" {
 			token = os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
 		}
-		client := godo.NewClient(oauth2.NewClient(context.TODO(), &apiTokenSource{
+
+		ua := useragent.String(version.PluginVersion.FormattedVersion())
+		opts := []godo.ClientOpt{godo.SetUserAgent(ua)}
+		client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
 			AccessToken: token,
-		}))
+		}), opts...)
+		if err != nil {
+			t.Fatalf("could not create client: %s", err)
+		}
+
 		image, _, err := client.Images.GetBySlug(context.TODO(), "ubuntu-20-04-x64")
 		if err != nil {
 			t.Fatalf("failed to retrieve image ID: %s", err)
