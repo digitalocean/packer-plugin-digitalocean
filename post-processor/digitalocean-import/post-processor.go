@@ -201,10 +201,15 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 	}
 	ui.Message(fmt.Sprintf("Completed upload of %s to spaces://%s/%s", source, p.config.SpaceName, p.config.ObjectName))
 
-	client := godo.NewClient(oauth2.NewClient(context.Background(), &apiTokenSource{
+	ua := useragent.String(version.PluginVersion.FormattedVersion())
+	opts := []godo.ClientOpt{godo.SetUserAgent(ua)}
+
+	client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
 		AccessToken: p.config.APIToken,
-	}))
-	client.UserAgent = useragent.String(version.PluginVersion.FormattedVersion())
+	}), opts...)
+	if err != nil {
+		return nil, false, false, fmt.Errorf("DigitalOcean: could not create client, %s", err)
+	}
 
 	ui.Message(fmt.Sprintf("Started import of spaces://%s/%s", p.config.SpaceName, p.config.ObjectName))
 	image, err := importImageFromSpaces(p, client)

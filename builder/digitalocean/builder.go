@@ -47,17 +47,22 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 }
 
 func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook) (packersdk.Artifact, error) {
-	client := godo.NewClient(oauth2.NewClient(context.TODO(), &apiTokenSource{
-		AccessToken: b.config.APIToken,
-	}))
-	client.UserAgent = useragent.String(version.PluginVersion.FormattedVersion())
-
+	ua := useragent.String(version.PluginVersion.FormattedVersion())
+	opts := []godo.ClientOpt{godo.SetUserAgent(ua)}
 	if b.config.APIURL != "" {
-		u, err := url.Parse(b.config.APIURL)
+		_, err := url.Parse(b.config.APIURL)
 		if err != nil {
 			return nil, fmt.Errorf("DigitalOcean: Invalid API URL, %s.", err)
 		}
-		client.BaseURL = u
+
+		opts = append(opts, godo.SetBaseURL(b.config.APIURL))
+	}
+
+	client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
+		AccessToken: b.config.APIToken,
+	}), opts...)
+	if err != nil {
+		return nil, fmt.Errorf("DigitalOcean: could not create client, %s", err)
 	}
 
 	if len(b.config.SnapshotRegions) > 0 {
