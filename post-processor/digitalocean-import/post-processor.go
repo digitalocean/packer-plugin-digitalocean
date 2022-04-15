@@ -21,10 +21,12 @@ import (
 
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer-plugin-digitalocean/builder/digitalocean"
+	"github.com/hashicorp/packer-plugin-digitalocean/version"
 	"github.com/hashicorp/packer-plugin-sdk/common"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer-plugin-sdk/template/config"
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
+	"github.com/hashicorp/packer-plugin-sdk/useragent"
 )
 
 const BuilderId = "packer.post-processor.digitalocean-import"
@@ -199,9 +201,15 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 	}
 	ui.Message(fmt.Sprintf("Completed upload of %s to spaces://%s/%s", source, p.config.SpaceName, p.config.ObjectName))
 
-	client := godo.NewClient(oauth2.NewClient(context.Background(), &apiTokenSource{
+	ua := useragent.String(version.PluginVersion.FormattedVersion())
+	opts := []godo.ClientOpt{godo.SetUserAgent(ua)}
+
+	client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
 		AccessToken: p.config.APIToken,
-	}))
+	}), opts...)
+	if err != nil {
+		return nil, false, false, fmt.Errorf("DigitalOcean: could not create client, %s", err)
+	}
 
 	ui.Message(fmt.Sprintf("Started import of spaces://%s/%s", p.config.SpaceName, p.config.ObjectName))
 	image, err := importImageFromSpaces(p, client)

@@ -11,10 +11,12 @@ import (
 
 	"github.com/digitalocean/godo"
 	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/hashicorp/packer-plugin-digitalocean/version"
 	"github.com/hashicorp/packer-plugin-sdk/communicator"
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/multistep/commonsteps"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
+	"github.com/hashicorp/packer-plugin-sdk/useragent"
 	"golang.org/x/oauth2"
 )
 
@@ -45,15 +47,22 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 }
 
 func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook) (packersdk.Artifact, error) {
-	client := godo.NewClient(oauth2.NewClient(context.TODO(), &apiTokenSource{
-		AccessToken: b.config.APIToken,
-	}))
+	ua := useragent.String(version.PluginVersion.FormattedVersion())
+	opts := []godo.ClientOpt{godo.SetUserAgent(ua)}
 	if b.config.APIURL != "" {
-		u, err := url.Parse(b.config.APIURL)
+		_, err := url.Parse(b.config.APIURL)
 		if err != nil {
 			return nil, fmt.Errorf("DigitalOcean: Invalid API URL, %s.", err)
 		}
-		client.BaseURL = u
+
+		opts = append(opts, godo.SetBaseURL(b.config.APIURL))
+	}
+
+	client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
+		AccessToken: b.config.APIToken,
+	}), opts...)
+	if err != nil {
+		return nil, fmt.Errorf("DigitalOcean: could not create client, %s", err)
 	}
 
 	if len(b.config.SnapshotRegions) > 0 {
