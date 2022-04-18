@@ -21,7 +21,7 @@ Then, run [`packer init`](https://www.packer.io/docs/commands/init).
 packer {
   required_plugins {
     digitalocean = {
-      version = ">= 1.0.0"
+      version = ">= 1.0.4"
       source  = "github.com/hashicorp/digitalocean"
     }
   }
