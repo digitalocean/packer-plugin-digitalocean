@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hashicorp/packer-plugin-digitalocean/builder/digitalocean"
-	digitaloceanPP "github.com/hashicorp/packer-plugin-digitalocean/post-processor/digitalocean-import"
-	"github.com/hashicorp/packer-plugin-digitalocean/version"
+	"github.com/digitalocean/packer-plugin-digitalocean/builder/digitalocean"
+	digitaloceanPP "github.com/digitalocean/packer-plugin-digitalocean/post-processor/digitalocean-import"
+	"github.com/digitalocean/packer-plugin-digitalocean/version"
 
 	"github.com/hashicorp/packer-plugin-sdk/plugin"
 )

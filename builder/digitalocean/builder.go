@@ -10,8 +10,8 @@ import (
 	"net/url"
 
 	"github.com/digitalocean/godo"
+	"github.com/digitalocean/packer-plugin-digitalocean/version"
 	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/packer-plugin-digitalocean/version"
 	"github.com/hashicorp/packer-plugin-sdk/communicator"
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	"github.com/hashicorp/packer-plugin-sdk/multistep/commonsteps"

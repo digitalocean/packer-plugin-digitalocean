@@ -19,9 +19,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/digitalocean/godo"
 
+	"github.com/digitalocean/packer-plugin-digitalocean/builder/digitalocean"
+	"github.com/digitalocean/packer-plugin-digitalocean/version"
 	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/packer-plugin-digitalocean/builder/digitalocean"
-	"github.com/hashicorp/packer-plugin-digitalocean/version"
 	"github.com/hashicorp/packer-plugin-sdk/common"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer-plugin-sdk/template/config"
