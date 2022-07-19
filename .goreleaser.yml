@@ -6,8 +6,7 @@ before:
   hooks:
     # We strongly recommend running tests to catch any regression before release.
     # Even though, this an optional step.
-    - go test ./...
-    # As part of the release doc files are included as a separate deliverable for
+    - go test ./... # As part of the release doc files are included as a separate deliverable for
     # consumption by Packer.io. To include a separate docs.zip uncomment the following command.
     - make ci-release-docs
     # Check plugin compatibility with required version of the Packer SDK
@@ -62,10 +61,17 @@ checksum:
   name_template: '{{ .ProjectName }}_v{{ .Version }}_SHA256SUMS'
   algorithm: sha256
 signs:
-  - cmd: signore
-    args: ["sign", "--dearmor", "--file", "${artifact}", "--out", "${signature}"]
-    artifacts: checksum
-    signature: ${artifact}.sig
+  - artifacts: checksum
+    args:
+      # if you are using this is in a GitHub action or some other automated pipeline, you
+      # need to pass the batch flag to indicate its not interactive.
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
 release:
   # If you want to manually examine the release before its live, uncomment this line:
   # draft: true
