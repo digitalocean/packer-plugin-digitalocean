@@ -33,14 +33,17 @@ jobs:
 
       - name: Ensure code is formatted with gofmt
         run: make check-fmt
+        if: matrix.os == 'ubuntu-latest'
 
       - name: Ensure generated code was recreated if needed
         run: make check-generate
+        if: matrix.os == 'ubuntu-latest'
 
       - name: Lint with golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
           only-new-issues: true
+        if: matrix.os == 'ubuntu-latest'
 
       - name: Run unit tests
         run: make test
