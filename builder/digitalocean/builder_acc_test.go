@@ -35,9 +35,7 @@ func TestBuilderAcc_imageId(t *testing.T) {
 
 func testAccPreCheck(t *testing.T) bool {
 	if os.Getenv(acctest.TestEnvVar) == "" {
-		t.Skip(fmt.Sprintf(
-			"Acceptance tests skipped unless env '%s' set",
-			acctest.TestEnvVar))
+		t.Skipf("Acceptance tests skipped unless env '%s' set", acctest.TestEnvVar)
 		return true
 	}
 	v := os.Getenv("DIGITALOCEAN_TOKEN")
