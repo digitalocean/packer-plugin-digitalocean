@@ -47,3 +47,4 @@ jobs:
 
       - name: Verify plugin binary works with Packer
         run: make plugin-check
+        if: matrix.os == 'ubuntu-latest'
