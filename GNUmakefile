@@ -47,7 +47,10 @@ install-golangci-lint:
 lint: install-golangci-lint
 	@golangci-lint run ./...
 
-check-fmt:
+fmt:
+	@go fmt ./...
+
+check-fmt: fmt
 	echo "==> Checking that code complies with go fmt requirements..."
 	git diff --exit-code; if [ $$? -eq 1 ]; then \
 		echo "Found files that are not fmt'ed."; \
