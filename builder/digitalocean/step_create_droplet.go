@@ -22,35 +22,6 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	ui := state.Get("ui").(packersdk.Ui)
 	c := state.Get("config").(*Config)
 
-	sshKeys := []godo.DropletCreateSSHKey{}
-	sshKeyId, hasSSHkey := state.GetOk("ssh_key_id")
-	if hasSSHkey {
-		sshKeys = append(sshKeys, godo.DropletCreateSSHKey{
-			ID: sshKeyId.(int),
-		})
-	}
-	if c.SSHKeyID != 0 {
-		sshKeys = append(sshKeys, godo.DropletCreateSSHKey{
-			ID: c.SSHKeyID,
-		})
-	}
-
-	// Create the droplet based on configuration
-	ui.Say("Creating droplet...")
-
-	userData := c.UserData
-	if c.UserDataFile != "" {
-		contents, err := ioutil.ReadFile(c.UserDataFile)
-		if err != nil {
-			state.Put("error", fmt.Errorf("Problem reading user data file: %s", err))
-			return multistep.ActionHalt
-		}
-
-		userData = string(contents)
-	}
-
-	createImage := getImageType(c.Image)
-
 	// Store the source image ID and
 	// other miscellaneous info for HCP Packer
 	state.Put("source_image_id", c.Image)
@@ -58,21 +29,15 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	state.Put("droplet_name", c.DropletName)
 	state.Put("build_region", c.Region)
 
-	dropletCreateReq := &godo.DropletCreateRequest{
-		Name:              c.DropletName,
-		Region:            c.Region,
-		Size:              c.Size,
-		Image:             createImage,
-		SSHKeys:           sshKeys,
-		PrivateNetworking: c.PrivateNetworking,
-		Monitoring:        c.Monitoring,
-		IPv6:              c.IPv6,
-		UserData:          userData,
-		Tags:              c.Tags,
-		VPCUUID:           c.VPCUUID,
+	// Create the droplet based on configuration
+	ui.Say("Creating droplet...")
+	dropletCreateReq, err := s.buildDropletCreateRequest(state)
+	if err != nil {
+		state.Put("error", err)
+		return multistep.ActionHalt
 	}
 
-	log.Printf("[DEBUG] Droplet create paramaters: %s", godo.Stringify(dropletCreateReq))
+	log.Printf("[DEBUG] Droplet create parameters: %s", godo.Stringify(dropletCreateReq))
 
 	droplet, _, err := client.Droplets.Create(context.TODO(), dropletCreateReq)
 	if err != nil {
@@ -92,6 +57,50 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	state.Put("instance_id", droplet.ID)
 
 	return multistep.ActionContinue
+}
+
+func (s *stepCreateDroplet) buildDropletCreateRequest(state multistep.StateBag) (*godo.DropletCreateRequest, error) {
+	c := state.Get("config").(*Config)
+
+	sshKeys := []godo.DropletCreateSSHKey{}
+	sshKeyID, hasSSHkey := state.GetOk("ssh_key_id")
+	if hasSSHkey {
+		sshKeys = append(sshKeys, godo.DropletCreateSSHKey{
+			ID: sshKeyID.(int),
+		})
+	}
+	if c.SSHKeyID != 0 {
+		sshKeys = append(sshKeys, godo.DropletCreateSSHKey{
+			ID: c.SSHKeyID,
+		})
+	}
+
+	userData := c.UserData
+	if c.UserDataFile != "" {
+		contents, err := ioutil.ReadFile(c.UserDataFile)
+		if err != nil {
+			return nil, fmt.Errorf("Problem reading user data file: %s", err)
+		}
+
+		userData = string(contents)
+	}
+
+	createImage := getImageType(c.Image)
+
+	return &godo.DropletCreateRequest{
+		Name:              c.DropletName,
+		Region:            c.Region,
+		Size:              c.Size,
+		Image:             createImage,
+		SSHKeys:           sshKeys,
+		PrivateNetworking: c.PrivateNetworking,
+		Monitoring:        c.Monitoring,
+		WithDropletAgent:  c.DropletAgent,
+		IPv6:              c.IPv6,
+		UserData:          userData,
+		Tags:              c.Tags,
+		VPCUUID:           c.VPCUUID,
+	}, nil
 }
 
 func (s *stepCreateDroplet) Cleanup(state multistep.StateBag) {
