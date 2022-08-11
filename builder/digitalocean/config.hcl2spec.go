@@ -74,6 +74,7 @@ type FlatConfig struct {
 	Image                     *string           `mapstructure:"image" required:"true" cty:"image" hcl:"image"`
 	PrivateNetworking         *bool             `mapstructure:"private_networking" required:"false" cty:"private_networking" hcl:"private_networking"`
 	Monitoring                *bool             `mapstructure:"monitoring" required:"false" cty:"monitoring" hcl:"monitoring"`
+	DropletAgent              *bool             `mapstructure:"droplet_agent" required:"false" cty:"droplet_agent" hcl:"droplet_agent"`
 	IPv6                      *bool             `mapstructure:"ipv6" required:"false" cty:"ipv6" hcl:"ipv6"`
 	SnapshotName              *string           `mapstructure:"snapshot_name" required:"false" cty:"snapshot_name" hcl:"snapshot_name"`
 	SnapshotRegions           []string          `mapstructure:"snapshot_regions" required:"false" cty:"snapshot_regions" hcl:"snapshot_regions"`
@@ -164,6 +165,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"image":                        &hcldec.AttrSpec{Name: "image", Type: cty.String, Required: false},
 		"private_networking":           &hcldec.AttrSpec{Name: "private_networking", Type: cty.Bool, Required: false},
 		"monitoring":                   &hcldec.AttrSpec{Name: "monitoring", Type: cty.Bool, Required: false},
+		"droplet_agent":                &hcldec.AttrSpec{Name: "droplet_agent", Type: cty.Bool, Required: false},
 		"ipv6":                         &hcldec.AttrSpec{Name: "ipv6", Type: cty.Bool, Required: false},
 		"snapshot_name":                &hcldec.AttrSpec{Name: "snapshot_name", Type: cty.String, Required: false},
 		"snapshot_regions":             &hcldec.AttrSpec{Name: "snapshot_regions", Type: cty.List(cty.String), Required: false},

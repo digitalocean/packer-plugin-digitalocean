@@ -51,6 +51,12 @@ type Config struct {
 	// Set to true to enable monitoring for the droplet
 	// being created. This defaults to false, or not enabled.
 	Monitoring bool `mapstructure:"monitoring" required:"false"`
+	// A boolean indicating whether to install the DigitalOcean agent used for
+	// providing access to the Droplet web console in the control panel. By
+	// default, the agent is installed on new Droplets but installation errors
+	// (i.e. OS not supported) are ignored. To prevent it from being installed,
+	// set to false. To make installation errors fatal, explicitly set it to true.
+	DropletAgent *bool `mapstructure:"droplet_agent" required:"false"`
 	// Set to true to enable ipv6 for the droplet being
 	// created. This defaults to false, or not enabled.
 	IPv6 bool `mapstructure:"ipv6" required:"false"`
