@@ -1,0 +1,196 @@
+package image
+
+import (
+	"context"
+	_ "embed"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"regexp"
+	"testing"
+
+	"github.com/digitalocean/godo"
+	"github.com/hashicorp/packer-plugin-sdk/acctest"
+)
+
+func TestAccDatasource_Validations(t *testing.T) {
+	// store to reset in Teardown
+	doToken := os.Getenv("DIGITALOCEAN_TOKEN")
+	doAccessToken := os.Getenv("DIGITALOCEAN_ACCESS_TOKEN")
+
+	tests := []*acctest.PluginTestCase{
+		{
+			Name: "test missing required values",
+			Setup: func() error {
+				// unset to ensure failure of token check
+				os.Unsetenv("DIGITALOCEAN_TOKEN")
+				os.Unsetenv("DIGITALOCEAN_ACCESS_TOKEN")
+				return nil
+			},
+			Teardown: func() error {
+				os.Setenv("DIGITALOCEAN_TOKEN", doToken)
+				os.Setenv("DIGITALOCEAN_ACCESS_TOKEN", doAccessToken)
+				return nil
+			},
+			Template: `data "digitalocean-image" "test" {}`,
+			Type:     "digitalocean-image",
+			Check: func(buildCommand *exec.Cmd, logfile string) error {
+				if buildCommand.ProcessState != nil {
+					if buildCommand.ProcessState.ExitCode() != 1 {
+						return fmt.Errorf("Unexpected exit code. Logfile: %s", logfile)
+					}
+				}
+
+				tokenRequired := "api_token is required"
+				nameOrRegex := "one of name or name_regex is required"
+
+				err := findInTestLog(t, logfile, tokenRequired)
+				if err != nil {
+					return err
+				}
+				err = findInTestLog(t, logfile, nameOrRegex)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			},
+		},
+		{
+			Name: "only one of name or name_regex can be set",
+			Setup: func() error {
+				return nil
+			},
+			Teardown: func() error {
+				return nil
+			},
+			Template: `data "digitalocean-image" "test" {
+				name = "foo"
+				name_regex = "foo.*"
+			}`,
+			Type: "digitalocean-image",
+			Check: func(buildCommand *exec.Cmd, logfile string) error {
+				if buildCommand.ProcessState != nil {
+					if buildCommand.ProcessState.ExitCode() != 1 {
+						return fmt.Errorf("Unexpected exit code. Logfile: %s", logfile)
+					}
+				}
+
+				nameOrRegex := "only one of name or name_regex can be set"
+				err := findInTestLog(t, logfile, nameOrRegex)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			},
+		},
+		{
+			Name: "invalid image type",
+			Setup: func() error {
+				return nil
+			},
+			Teardown: func() error {
+				return nil
+			},
+			Template: `data "digitalocean-image" "test" {
+				name = "foo"
+				type = "1-click"
+			}`,
+			Type: "digitalocean-image",
+			Check: func(buildCommand *exec.Cmd, logfile string) error {
+				if buildCommand.ProcessState != nil {
+					if buildCommand.ProcessState.ExitCode() != 1 {
+						return fmt.Errorf("Unexpected exit code. Logfile: %s", logfile)
+					}
+				}
+
+				invalid := `invalid type; must be one of`
+				err := findInTestLog(t, logfile, invalid)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			acctest.TestPlugin(t, tt)
+		})
+	}
+}
+
+func TestAccDatasource_Basic(t *testing.T) {
+	if os.Getenv("PACKER_ACC") == "" {
+		t.Skip("Acceptance tests skipped unless env 'PACKER_ACC' set")
+	}
+
+	token := os.Getenv("DIGITALOCEAN_TOKEN")
+	if token == "" {
+		t.Fatal("DIGITALOCEAN_TOKEN environment variable required")
+	}
+	client := godo.NewFromToken(token)
+	images, _, err := client.Images.ListApplication(context.TODO(), nil)
+	if err != nil {
+		t.Error(err)
+	}
+	expectedImageID := images[0].ID
+	datsourceFixture := fmt.Sprintf(`
+	data "digitalocean-image" "test" {
+		name = "%s"
+		region = "nyc3"
+		type  = "application"
+	}`, images[0].Name)
+
+	testCase := &acctest.PluginTestCase{
+		Name: "scaffolding_datasource_basic_test",
+		Setup: func() error {
+			return nil
+		},
+		Teardown: func() error {
+			return nil
+		},
+		Template: datsourceFixture,
+		Type:     "digitalocean-image",
+		Check: func(buildCommand *exec.Cmd, logfile string) error {
+			if buildCommand.ProcessState != nil {
+				if buildCommand.ProcessState.ExitCode() != 0 {
+					return fmt.Errorf("Bad exit code. Logfile: %s", logfile)
+				}
+			}
+
+			imageLog := fmt.Sprintf("found image: %d", expectedImageID)
+			err := findInTestLog(t, logfile, imageLog)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+
+	acctest.TestPlugin(t, testCase)
+}
+
+func findInTestLog(t *testing.T, logfile string, expected string) error {
+	logs, err := os.Open(logfile)
+	if err != nil {
+		return fmt.Errorf("Unable find %s", logfile)
+	}
+	defer logs.Close()
+
+	logsBytes, err := ioutil.ReadAll(logs)
+	if err != nil {
+		return fmt.Errorf("Unable to read %s", logfile)
+	}
+	logsString := string(logsBytes)
+
+	if matched, _ := regexp.MatchString(expected+".*", logsString); !matched {
+		t.Fatalf("logs doesn't contain expected value %q", logsString)
+	}
+
+	return nil
+}

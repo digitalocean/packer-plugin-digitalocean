@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/digitalocean/packer-plugin-digitalocean/builder/digitalocean"
+	"github.com/digitalocean/packer-plugin-digitalocean/datasource/image"
 	digitaloceanPP "github.com/digitalocean/packer-plugin-digitalocean/post-processor/digitalocean-import"
 	"github.com/digitalocean/packer-plugin-digitalocean/version"
 
@@ -15,6 +16,7 @@ func main() {
 	pps := plugin.NewSet()
 	pps.RegisterBuilder(plugin.DEFAULT_NAME, new(digitalocean.Builder))
 	pps.RegisterPostProcessor("import", new(digitaloceanPP.PostProcessor))
+	pps.RegisterDatasource("image", new(image.Datasource))
 	pps.SetVersion(version.PluginVersion)
 	err := pps.Run()
 	if err != nil {

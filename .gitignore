@@ -2,3 +2,5 @@ main
 dist/*
 packer-plugin-digitalocean
 .vscode/
+docs-partials/
+docs.zip

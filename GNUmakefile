@@ -15,7 +15,7 @@ dev: build
 	@mv ${BINARY} ~/.packer.d/plugins/${BINARY}
 
 test:
-	@go test -v -race -count $(COUNT) $(TEST) -timeout=3m
+	@go test -v -race -count $(COUNT) ./...  $(TEST) -timeout=3m
 
 install-packer-sdc: ## Install packer sofware development command
 	@go install github.com/hashicorp/packer-plugin-sdk/cmd/packer-sdc@${HASHICORP_PACKER_PLUGIN_SDK_VERSION}
@@ -28,7 +28,7 @@ plugin-check: install-packer-sdc build
 	@packer-sdc plugin-check ${BINARY}
 
 testacc: dev
-	@PACKER_ACC=1 go test -count $(COUNT) -v $(TEST) -timeout=120m
+	@PACKER_ACC=1 go test -count $(COUNT) -v ./...  $(TEST) -timeout=120m
 
 generate: install-packer-sdc
 	@go generate ./...
