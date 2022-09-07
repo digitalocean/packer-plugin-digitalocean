@@ -58,7 +58,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		opts = append(opts, godo.SetBaseURL(b.config.APIURL))
 	}
 
-	client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
+	client, err := godo.New(oauth2.NewClient(context.TODO(), &APITokenSource{
 		AccessToken: b.config.APIToken,
 	}), opts...)
 	if err != nil {

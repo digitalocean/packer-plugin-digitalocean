@@ -61,7 +61,7 @@ func makeTemplateWithImageId(t *testing.T) string {
 
 		ua := useragent.String(version.PluginVersion.FormattedVersion())
 		opts := []godo.ClientOpt{godo.SetUserAgent(ua)}
-		client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
+		client, err := godo.New(oauth2.NewClient(context.TODO(), &APITokenSource{
 			AccessToken: token,
 		}), opts...)
 		if err != nil {
