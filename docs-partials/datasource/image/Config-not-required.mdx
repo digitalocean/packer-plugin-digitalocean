@@ -1,0 +1,19 @@
+<!-- Code generated from the comments of the Config struct in datasource/image/data.go; DO NOT EDIT MANUALLY -->
+
+- `api_url` (string) - A non-standard API endpoint URL. Set this if you are  using a DigitalOcean API
+  compatible service. It can also be specified via environment variable DIGITALOCEAN_API_URL.
+
+- `name` (string) - The name of the image to return. Only one of `name` or `name_regex` may be provided.
+
+- `name_regex` (string) - A regex matching the name of the image to return. Only one of `name` or `name_regex` may be provided.
+
+- `type` (string) - Filter the images searched by type. This may be one of `application`, `distribution`, or `user`.
+  By default, all image types are searched.
+
+- `region` (string) - A DigitalOcean region slug (e.g. `nyc3`). When provided, only images available in that region
+  will be returned.
+
+- `latest` (bool) - A boolean value determining how to handle multiple matching images. By default, multiple matching images
+  results in an error. When set to `true`, the most recently created image is returned instead.
+
+<!-- End of code generated from the comments of the Config struct in datasource/image/data.go; -->
