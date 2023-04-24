@@ -11,6 +11,9 @@ updates:
       interval: "daily"
     allow:
       - dependency-name: "github.com/hashicorp/packer-plugin-sdk"
-      - dependency-name: "github.com/hashicorp/hcl/v2"
-      - dependency-name: "github.com/zclconf/go-cty"
+      - dependency-name: "github.com/digitalocean/godo"
+      # Currently pinned due to a breaking change.
+      # See: https://github.com/digitalocean/packer-plugin-digitalocean/pull/89#issuecomment-1503016605
+      # - dependency-name: "github.com/hashicorp/hcl/v2"
+      # - dependency-name: "github.com/zclconf/go-cty"
 
