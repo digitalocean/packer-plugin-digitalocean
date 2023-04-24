@@ -102,9 +102,6 @@ type Config struct {
 	// The ID of an existing SSH key on the DigitalOcean account. This should be
 	// used in conjunction with `ssh_private_key_file`.
 	SSHKeyID int `mapstructure:"ssh_key_id" required:"false"`
-	// The path to an SSH private key file. When excluded, an SSH key  will be
-	// automatically generated and used to build the image.
-	SSHPrivateKeyFile string `mapstructure:"ssh_private_key_file" required:"false"`
 
 	ctx interpolate.Context
 }
