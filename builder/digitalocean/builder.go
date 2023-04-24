@@ -35,7 +35,7 @@ func (b *Builder) ConfigSpec() hcldec.ObjectSpec { return b.config.FlatMapstruct
 func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 
 	warnings, errs := b.config.Prepare(raws...)
-	if b.config.SSHKeyID != 0 && b.config.SSHPrivateKeyFile == "" {
+	if b.config.SSHKeyID != 0 && b.config.Comm.SSHPrivateKeyFile == "" {
 		errs = packersdk.MultiErrorAppend(errs,
 			fmt.Errorf("Must specify a `ssh_private_key_file` when using `ssh_key_id`."))
 	}
