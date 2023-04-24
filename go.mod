@@ -1,6 +1,6 @@
 module github.com/digitalocean/packer-plugin-digitalocean
 
-go 1.17
+go 1.20
 
 require (
 	github.com/aws/aws-sdk-go v1.44.114
