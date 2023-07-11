@@ -1,7 +1,7 @@
 packer {
   required_plugins {
     digitalocean = {
-      source  = "github.com/hashicorp/digitalocean"
+      source  = "github.com/digitalocean/digitalocean"
     }
   }
 }
