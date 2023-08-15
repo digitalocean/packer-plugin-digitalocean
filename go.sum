@@ -75,8 +75,8 @@ github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ3
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/digitalocean/godo v1.101.0 h1:gtnKn+TdW7e1y42q3ms86GXWWC/4kHttKJyTFZqdmEw=
-github.com/digitalocean/godo v1.101.0/go.mod h1:SaUYccN7r+CO1QtsbXGypAsgobDrmSfVMJESEfXgoEg=
+github.com/digitalocean/godo v1.102.0 h1:iXkLEHmrBi5n9TAbRcKM0182NwXYrp1xCj//7vMRFs4=
+github.com/digitalocean/godo v1.102.0/go.mod h1:SaUYccN7r+CO1QtsbXGypAsgobDrmSfVMJESEfXgoEg=
 github.com/docker/distribution v2.7.1+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/docker/docker v1.4.2-0.20200319182547-c7ad2b866182/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/docker/go-connections v0.4.0/go.mod h1:Gbd7IOopHjR8Iph03tsViu4nIes5XhDvyHbTtUxmeec=
