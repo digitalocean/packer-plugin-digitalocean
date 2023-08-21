@@ -69,6 +69,9 @@ type FlatConfig struct {
 	WinRMUseNTLM              *bool             `mapstructure:"winrm_use_ntlm" cty:"winrm_use_ntlm" hcl:"winrm_use_ntlm"`
 	APIToken                  *string           `mapstructure:"api_token" required:"true" cty:"api_token" hcl:"api_token"`
 	APIURL                    *string           `mapstructure:"api_url" required:"false" cty:"api_url" hcl:"api_url"`
+	HTTPRetryMax              *int              `mapstructure:"http_retry_max" required:"false" cty:"http_retry_max" hcl:"http_retry_max"`
+	HTTPRetryWaitMax          *float64          `mapstructure:"http_retry_wait_max" required:"false" cty:"http_retry_wait_max" hcl:"http_retry_wait_max"`
+	HTTPRetryWaitMin          *float64          `mapstructure:"http_retry_wait_min" required:"false" cty:"http_retry_wait_min" hcl:"http_retry_wait_min"`
 	Region                    *string           `mapstructure:"region" required:"true" cty:"region" hcl:"region"`
 	Size                      *string           `mapstructure:"size" required:"true" cty:"size" hcl:"size"`
 	Image                     *string           `mapstructure:"image" required:"true" cty:"image" hcl:"image"`
@@ -160,6 +163,9 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"winrm_use_ntlm":               &hcldec.AttrSpec{Name: "winrm_use_ntlm", Type: cty.Bool, Required: false},
 		"api_token":                    &hcldec.AttrSpec{Name: "api_token", Type: cty.String, Required: false},
 		"api_url":                      &hcldec.AttrSpec{Name: "api_url", Type: cty.String, Required: false},
+		"http_retry_max":               &hcldec.AttrSpec{Name: "http_retry_max", Type: cty.Number, Required: false},
+		"http_retry_wait_max":          &hcldec.AttrSpec{Name: "http_retry_wait_max", Type: cty.Number, Required: false},
+		"http_retry_wait_min":          &hcldec.AttrSpec{Name: "http_retry_wait_min", Type: cty.Number, Required: false},
 		"region":                       &hcldec.AttrSpec{Name: "region", Type: cty.String, Required: false},
 		"size":                         &hcldec.AttrSpec{Name: "size", Type: cty.String, Required: false},
 		"image":                        &hcldec.AttrSpec{Name: "image", Type: cty.String, Required: false},

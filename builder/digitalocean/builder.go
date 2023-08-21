@@ -57,6 +57,14 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 
 		opts = append(opts, godo.SetBaseURL(b.config.APIURL))
 	}
+	if *b.config.HTTPRetryMax > 0 {
+		opts = append(opts, godo.WithRetryAndBackoffs(godo.RetryConfig{
+			RetryMax:     *b.config.HTTPRetryMax,
+			RetryWaitMin: b.config.HTTPRetryWaitMin,
+			RetryWaitMax: b.config.HTTPRetryWaitMax,
+			Logger:       log.Default(),
+		}))
+	}
 
 	client, err := godo.New(oauth2.NewClient(context.TODO(), &APITokenSource{
 		AccessToken: b.config.APIToken,

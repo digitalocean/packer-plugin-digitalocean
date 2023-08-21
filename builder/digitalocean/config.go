@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"time"
 
+	"github.com/digitalocean/godo"
 	"github.com/hashicorp/packer-plugin-sdk/common"
 	"github.com/hashicorp/packer-plugin-sdk/communicator"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
@@ -30,6 +32,13 @@ type Config struct {
 	// using a DigitalOcean API compatible service. It can also be specified via
 	// environment variable DIGITALOCEAN_API_URL.
 	APIURL string `mapstructure:"api_url" required:"false"`
+	// The maximum number of retries for requests that fail with a 429 or 500-level error.
+	// The default value is 5. Set to 0 to disable reties.
+	HTTPRetryMax *int `mapstructure:"http_retry_max" required:"false"`
+	// The maximum wait time (in seconds) between failed API requests. Default: 30.0
+	HTTPRetryWaitMax *float64 `mapstructure:"http_retry_wait_max" required:"false"`
+	// The minimum wait time (in seconds) between failed API requests. Default: 1.0
+	HTTPRetryWaitMin *float64 `mapstructure:"http_retry_wait_min" required:"false"`
 	// The name (or slug) of the region to launch the droplet
 	// in. Consequently, this is the region where the snapshot will be available.
 	// See
@@ -146,6 +155,37 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	if c.APIURL == "" {
 		c.APIURL = os.Getenv("DIGITALOCEAN_API_URL")
 	}
+	if c.HTTPRetryMax == nil {
+		c.HTTPRetryMax = godo.PtrTo(5)
+		if max := os.Getenv("DIGITALOCEAN_HTTP_RETRY_MAX"); max != "" {
+			maxInt, err := strconv.Atoi(max)
+			if err != nil {
+				return nil, err
+			}
+			c.HTTPRetryMax = godo.PtrTo(maxInt)
+		}
+	}
+	if c.HTTPRetryWaitMax == nil {
+		c.HTTPRetryWaitMax = godo.PtrTo(30.0)
+		if waitMax := os.Getenv("DIGITALOCEAN_HTTP_RETRY_WAIT_MAX"); waitMax != "" {
+			waitMaxFloat, err := strconv.ParseFloat(waitMax, 64)
+			if err != nil {
+				return nil, err
+			}
+			c.HTTPRetryWaitMax = godo.PtrTo(waitMaxFloat)
+		}
+	}
+	if c.HTTPRetryWaitMin == nil {
+		c.HTTPRetryWaitMin = godo.PtrTo(1.0)
+		if waitMin := os.Getenv("DIGITALOCEAN_HTTP_RETRY_WAIT_MIN"); waitMin != "" {
+			waitMinFloat, err := strconv.ParseFloat(waitMin, 64)
+			if err != nil {
+				return nil, err
+			}
+			c.HTTPRetryWaitMin = godo.PtrTo(waitMinFloat)
+		}
+	}
+
 	if c.SnapshotName == "" {
 		def, err := interpolate.Render("packer-{{timestamp}}", nil)
 		if err != nil {
