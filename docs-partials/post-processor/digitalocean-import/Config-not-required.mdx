@@ -1,0 +1,30 @@
+<!-- Code generated from the comments of the Config struct in post-processor/digitalocean-import/post-processor.go; DO NOT EDIT MANUALLY -->
+
+- `http_retry_max` (\*int) - The maximum number of retries for requests that fail with a 429 or 500-level error.
+  The default value is 5. Set to 0 to disable reties.
+
+- `http_retry_wait_max` (\*float64) - The maximum wait time (in seconds) between failed API requests. Default: 30.0
+
+- `http_retry_wait_min` (\*float64) - The minimum wait time (in seconds) between failed API requests. Default: 1.0
+
+- `space_object_name` (string) - The name of the key used in the Space where the image file will be copied
+  to for import. This is treated as a [template engine](/docs/templates/legacy_json_templates/engine).
+  Therefore, you may use user variables and template functions in this field.
+  If not specified, this will default to `packer-import-{{timestamp}}`.
+
+- `skip_clean` (bool) - Whether we should skip removing the image file uploaded to Spaces after
+  the import process has completed. "true" means that we should leave it in
+  the Space, "false" means to clean it out. Defaults to `false`.
+
+- `image_tags` ([]string) - A list of tags to apply to the resulting imported image.
+
+- `image_description` (string) - The description to set for the resulting imported image.
+
+- `image_distribution` (string) - The name of the distribution to set for the resulting imported image.
+
+- `timeout` (duration string | ex: "1h5m2s") - The length of time in minutes to wait for individual steps in the process
+  to successfully complete. This includes both importing the image from Spaces
+  as well as distributing the resulting image to additional regions. If not
+  specified, this will default to 20.
+
+<!-- End of code generated from the comments of the Config struct in post-processor/digitalocean-import/post-processor.go; -->
