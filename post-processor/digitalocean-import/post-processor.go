@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -37,6 +38,13 @@ type Config struct {
 	APIToken     string `mapstructure:"api_token"`
 	SpacesKey    string `mapstructure:"spaces_key"`
 	SpacesSecret string `mapstructure:"spaces_secret"`
+	// The maximum number of retries for requests that fail with a 429 or 500-level error.
+	// The default value is 5. Set to 0 to disable reties.
+	HTTPRetryMax *int `mapstructure:"http_retry_max" required:"false"`
+	// The maximum wait time (in seconds) between failed API requests. Default: 30.0
+	HTTPRetryWaitMax *float64 `mapstructure:"http_retry_wait_max" required:"false"`
+	// The minimum wait time (in seconds) between failed API requests. Default: 1.0
+	HTTPRetryWaitMin *float64 `mapstructure:"http_retry_wait_min" required:"false"`
 
 	SpacesRegion string   `mapstructure:"spaces_region"`
 	SpaceName    string   `mapstructure:"space_name"`
@@ -106,6 +114,37 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 	}
 	if p.config.APIToken == "" {
 		p.config.APIToken = os.Getenv("DIGITALOCEAN_API_TOKEN")
+	}
+
+	if p.config.HTTPRetryMax == nil {
+		p.config.HTTPRetryMax = godo.PtrTo(5)
+		if max := os.Getenv("DIGITALOCEAN_HTTP_RETRY_MAX"); max != "" {
+			maxInt, err := strconv.Atoi(max)
+			if err != nil {
+				return err
+			}
+			p.config.HTTPRetryMax = godo.PtrTo(maxInt)
+		}
+	}
+	if p.config.HTTPRetryWaitMax == nil {
+		p.config.HTTPRetryWaitMax = godo.PtrTo(30.0)
+		if waitMax := os.Getenv("DIGITALOCEAN_HTTP_RETRY_WAIT_MAX"); waitMax != "" {
+			waitMaxFloat, err := strconv.ParseFloat(waitMax, 64)
+			if err != nil {
+				return err
+			}
+			p.config.HTTPRetryWaitMax = godo.PtrTo(waitMaxFloat)
+		}
+	}
+	if p.config.HTTPRetryWaitMin == nil {
+		p.config.HTTPRetryWaitMin = godo.PtrTo(1.0)
+		if waitMin := os.Getenv("DIGITALOCEAN_HTTP_RETRY_WAIT_MIN"); waitMin != "" {
+			waitMinFloat, err := strconv.ParseFloat(waitMin, 64)
+			if err != nil {
+				return err
+			}
+			p.config.HTTPRetryWaitMin = godo.PtrTo(waitMinFloat)
+		}
 	}
 
 	if p.config.ObjectName == "" {
@@ -203,6 +242,15 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 
 	ua := useragent.String(version.PluginVersion.FormattedVersion())
 	opts := []godo.ClientOpt{godo.SetUserAgent(ua)}
+
+	if *p.config.HTTPRetryMax > 0 {
+		opts = append(opts, godo.WithRetryAndBackoffs(godo.RetryConfig{
+			RetryMax:     *p.config.HTTPRetryMax,
+			RetryWaitMin: p.config.HTTPRetryWaitMin,
+			RetryWaitMax: p.config.HTTPRetryWaitMax,
+			Logger:       log.Default(),
+		}))
+	}
 
 	client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
 		AccessToken: p.config.APIToken,

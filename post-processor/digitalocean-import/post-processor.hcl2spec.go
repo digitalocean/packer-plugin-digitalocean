@@ -21,6 +21,9 @@ type FlatConfig struct {
 	APIToken            *string           `mapstructure:"api_token" cty:"api_token" hcl:"api_token"`
 	SpacesKey           *string           `mapstructure:"spaces_key" cty:"spaces_key" hcl:"spaces_key"`
 	SpacesSecret        *string           `mapstructure:"spaces_secret" cty:"spaces_secret" hcl:"spaces_secret"`
+	HTTPRetryMax        *int              `mapstructure:"http_retry_max" required:"false" cty:"http_retry_max" hcl:"http_retry_max"`
+	HTTPRetryWaitMax    *float64          `mapstructure:"http_retry_wait_max" required:"false" cty:"http_retry_wait_max" hcl:"http_retry_wait_max"`
+	HTTPRetryWaitMin    *float64          `mapstructure:"http_retry_wait_min" required:"false" cty:"http_retry_wait_min" hcl:"http_retry_wait_min"`
 	SpacesRegion        *string           `mapstructure:"spaces_region" cty:"spaces_region" hcl:"spaces_region"`
 	SpaceName           *string           `mapstructure:"space_name" cty:"space_name" hcl:"space_name"`
 	ObjectName          *string           `mapstructure:"space_object_name" cty:"space_object_name" hcl:"space_object_name"`
@@ -56,6 +59,9 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"api_token":                  &hcldec.AttrSpec{Name: "api_token", Type: cty.String, Required: false},
 		"spaces_key":                 &hcldec.AttrSpec{Name: "spaces_key", Type: cty.String, Required: false},
 		"spaces_secret":              &hcldec.AttrSpec{Name: "spaces_secret", Type: cty.String, Required: false},
+		"http_retry_max":             &hcldec.AttrSpec{Name: "http_retry_max", Type: cty.Number, Required: false},
+		"http_retry_wait_max":        &hcldec.AttrSpec{Name: "http_retry_wait_max", Type: cty.Number, Required: false},
+		"http_retry_wait_min":        &hcldec.AttrSpec{Name: "http_retry_wait_min", Type: cty.Number, Required: false},
 		"spaces_region":              &hcldec.AttrSpec{Name: "spaces_region", Type: cty.String, Required: false},
 		"space_name":                 &hcldec.AttrSpec{Name: "space_name", Type: cty.String, Required: false},
 		"space_object_name":          &hcldec.AttrSpec{Name: "space_object_name", Type: cty.String, Required: false},
