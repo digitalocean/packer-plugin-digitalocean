@@ -5,10 +5,10 @@ go 1.20
 require (
 	github.com/aws/aws-sdk-go v1.44.114
 	github.com/digitalocean/godo v1.102.1
-	github.com/hashicorp/hcl/v2 v2.14.1
-	github.com/hashicorp/packer-plugin-sdk v0.4.0
+	github.com/hashicorp/hcl/v2 v2.16.2
+	github.com/hashicorp/packer-plugin-sdk v0.5.1
 	github.com/mitchellh/mapstructure v1.4.1
-	github.com/zclconf/go-cty v1.10.0
+	github.com/zclconf/go-cty v1.12.1
 	golang.org/x/oauth2 v0.1.0
 )
 
@@ -101,3 +101,5 @@ require (
 	golang.org/x/net v0.8.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
+
+replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.12.1 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
