@@ -3,6 +3,13 @@
 - `api_url` (string) - A non-standard API endpoint URL. Set this if you are  using a DigitalOcean API
   compatible service. It can also be specified via environment variable DIGITALOCEAN_API_URL.
 
+- `http_retry_max` (\*int) - The maximum number of retries for requests that fail with a 429 or 500-level error.
+  The default value is 5. Set to 0 to disable reties.
+
+- `http_retry_wait_max` (\*float64) - The maximum wait time (in seconds) between failed API requests. Default: 30.0
+
+- `http_retry_wait_min` (\*float64) - The minimum wait time (in seconds) between failed API requests. Default: 1.0
+
 - `name` (string) - The name of the image to return. Only one of `name` or `name_regex` may be provided.
 
 - `name_regex` (string) - A regex matching the name of the image to return. Only one of `name` or `name_regex` may be provided.

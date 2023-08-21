@@ -11,6 +11,7 @@ import (
 	"os"
 	"regexp"
 	"sort"
+	"strconv"
 	"time"
 
 	builder "github.com/digitalocean/packer-plugin-digitalocean/builder/digitalocean"
@@ -37,6 +38,13 @@ type Config struct {
 	// A non-standard API endpoint URL. Set this if you are  using a DigitalOcean API
 	// compatible service. It can also be specified via environment variable DIGITALOCEAN_API_URL.
 	APIURL string `mapstructure:"api_url"`
+	// The maximum number of retries for requests that fail with a 429 or 500-level error.
+	// The default value is 5. Set to 0 to disable reties.
+	HTTPRetryMax *int `mapstructure:"http_retry_max" required:"false"`
+	// The maximum wait time (in seconds) between failed API requests. Default: 30.0
+	HTTPRetryWaitMax *float64 `mapstructure:"http_retry_wait_max" required:"false"`
+	// The minimum wait time (in seconds) between failed API requests. Default: 1.0
+	HTTPRetryWaitMin *float64 `mapstructure:"http_retry_wait_min" required:"false"`
 	// The name of the image to return. Only one of `name` or `name_regex` may be provided.
 	Name string `mapstructure:"name"`
 	// A regex matching the name of the image to return. Only one of `name` or `name_regex` may be provided.
@@ -85,6 +93,37 @@ func (d *Datasource) Configure(raws ...interface{}) error {
 		d.config.APIURL = os.Getenv("DIGITALOCEAN_API_URL")
 	}
 
+	if d.config.HTTPRetryMax == nil {
+		d.config.HTTPRetryMax = godo.PtrTo(5)
+		if max := os.Getenv("DIGITALOCEAN_HTTP_RETRY_MAX"); max != "" {
+			maxInt, err := strconv.Atoi(max)
+			if err != nil {
+				return err
+			}
+			d.config.HTTPRetryMax = godo.PtrTo(maxInt)
+		}
+	}
+	if d.config.HTTPRetryWaitMax == nil {
+		d.config.HTTPRetryWaitMax = godo.PtrTo(30.0)
+		if waitMax := os.Getenv("DIGITALOCEAN_HTTP_RETRY_WAIT_MAX"); waitMax != "" {
+			waitMaxFloat, err := strconv.ParseFloat(waitMax, 64)
+			if err != nil {
+				return err
+			}
+			d.config.HTTPRetryWaitMax = godo.PtrTo(waitMaxFloat)
+		}
+	}
+	if d.config.HTTPRetryWaitMin == nil {
+		d.config.HTTPRetryWaitMin = godo.PtrTo(1.0)
+		if waitMin := os.Getenv("DIGITALOCEAN_HTTP_RETRY_WAIT_MIN"); waitMin != "" {
+			waitMinFloat, err := strconv.ParseFloat(waitMin, 64)
+			if err != nil {
+				return err
+			}
+			d.config.HTTPRetryWaitMin = godo.PtrTo(waitMinFloat)
+		}
+	}
+
 	if d.config.APIToken == "" {
 		errs = packersdk.MultiErrorAppend(errs, errors.New("api_token is required"))
 	}
@@ -124,6 +163,15 @@ func (d *Datasource) Execute() (cty.Value, error) {
 		}
 
 		clientOpts = append(clientOpts, godo.SetBaseURL(d.config.APIURL))
+	}
+
+	if *d.config.HTTPRetryMax > 0 {
+		clientOpts = append(clientOpts, godo.WithRetryAndBackoffs(godo.RetryConfig{
+			RetryMax:     *d.config.HTTPRetryMax,
+			RetryWaitMin: d.config.HTTPRetryWaitMin,
+			RetryWaitMax: d.config.HTTPRetryWaitMax,
+			Logger:       log.Default(),
+		}))
 	}
 
 	oauthClient := oauth2.NewClient(context.TODO(), &builder.APITokenSource{
