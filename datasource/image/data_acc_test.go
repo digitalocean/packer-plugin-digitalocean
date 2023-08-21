@@ -11,7 +11,9 @@ import (
 	"testing"
 
 	"github.com/digitalocean/godo"
+	builder "github.com/digitalocean/packer-plugin-digitalocean/builder/digitalocean"
 	"github.com/hashicorp/packer-plugin-sdk/acctest"
+	"golang.org/x/oauth2"
 )
 
 func TestAccDatasource_Validations(t *testing.T) {
@@ -133,18 +135,46 @@ func TestAccDatasource_Basic(t *testing.T) {
 	if token == "" {
 		t.Fatal("DIGITALOCEAN_TOKEN environment variable required")
 	}
-	client := godo.NewFromToken(token)
+	oauthClient := oauth2.NewClient(context.TODO(), &builder.APITokenSource{
+		AccessToken: token,
+	})
+	client, err := godo.New(oauthClient, godo.WithRetryAndBackoffs(godo.RetryConfig{
+		RetryMax: 5,
+	}))
+	if err != nil {
+		t.Fatalf("could not create client: %s", err)
+	}
+
+	file, err := os.CreateTemp("/tmp", "packer")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(file.Name())
+
 	images, _, err := client.Images.ListApplication(context.TODO(), nil)
 	if err != nil {
 		t.Error(err)
 	}
 	expectedImageID := images[0].ID
 	datsourceFixture := fmt.Sprintf(`
-	data "digitalocean-image" "test" {
-		name = "%s"
-		region = "nyc3"
-		type  = "application"
-	}`, images[0].Name)
+data "digitalocean-image" "test" {
+	name = "%s"
+	region = "nyc3"
+	type  = "application"
+}
+
+locals {
+	image_id = data.digitalocean-image.test.image_id
+}
+
+source "file" "basic-example" {
+	content =  local.image_id
+	target =  "%s"
+}
+
+build {
+	sources = ["sources.file.basic-example"]
+}`, images[0].Name, file.Name())
 
 	testCase := &acctest.PluginTestCase{
 		Name: "scaffolding_datasource_basic_test",
