@@ -1,3 +1,4 @@
+//go:generate packer-sdc struct-markdown
 //go:generate packer-sdc mapstructure-to-hcl2 -type Config
 
 package digitaloceanimport
@@ -7,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -34,20 +36,52 @@ const BuilderId = "packer.post-processor.digitalocean-import"
 type Config struct {
 	common.PackerConfig `mapstructure:",squash"`
 
-	APIToken     string `mapstructure:"api_token"`
-	SpacesKey    string `mapstructure:"spaces_key"`
-	SpacesSecret string `mapstructure:"spaces_secret"`
-
-	SpacesRegion string   `mapstructure:"spaces_region"`
-	SpaceName    string   `mapstructure:"space_name"`
-	ObjectName   string   `mapstructure:"space_object_name"`
-	SkipClean    bool     `mapstructure:"skip_clean"`
-	Tags         []string `mapstructure:"image_tags"`
-	Name         string   `mapstructure:"image_name"`
-	Description  string   `mapstructure:"image_description"`
-	Distribution string   `mapstructure:"image_distribution"`
-	ImageRegions []string `mapstructure:"image_regions"`
-
+	// A personal access token used to communicate with the DigitalOcean v2 API.
+	// This may also be set using the `DIGITALOCEAN_TOKEN` or
+	// `DIGITALOCEAN_ACCESS_TOKEN` environmental variables.
+	APIToken string `mapstructure:"api_token" required:"true"`
+	// The access key used to communicate with Spaces. This may also be set using
+	// the `DIGITALOCEAN_SPACES_ACCESS_KEY` environmental variable.
+	SpacesKey string `mapstructure:"spaces_key" required:"true"`
+	// The secret key used to communicate with Spaces. This may also be set using
+	// the `DIGITALOCEAN_SPACES_SECRET_KEY` environmental variable.
+	SpacesSecret string `mapstructure:"spaces_secret" required:"true"`
+	// The maximum number of retries for requests that fail with a 429 or 500-level error.
+	// The default value is 5. Set to 0 to disable reties.
+	HTTPRetryMax *int `mapstructure:"http_retry_max" required:"false"`
+	// The maximum wait time (in seconds) between failed API requests. Default: 30.0
+	HTTPRetryWaitMax *float64 `mapstructure:"http_retry_wait_max" required:"false"`
+	// The minimum wait time (in seconds) between failed API requests. Default: 1.0
+	HTTPRetryWaitMin *float64 `mapstructure:"http_retry_wait_min" required:"false"`
+	// The name of the region, such as `nyc3`, in which to upload the image to Spaces.
+	SpacesRegion string `mapstructure:"spaces_region" required:"true"`
+	// The name of the specific Space where the image file will be copied to for
+	// import. This Space must exist when the post-processor is run.
+	SpaceName string `mapstructure:"space_name" required:"true"`
+	// The name of the key used in the Space where the image file will be copied
+	// to for import. This is treated as a [template engine](/docs/templates/legacy_json_templates/engine).
+	// Therefore, you may use user variables and template functions in this field.
+	// If not specified, this will default to `packer-import-{{timestamp}}`.
+	ObjectName string `mapstructure:"space_object_name"`
+	// Whether we should skip removing the image file uploaded to Spaces after
+	// the import process has completed. "true" means that we should leave it in
+	// the Space, "false" means to clean it out. Defaults to `false`.
+	SkipClean bool `mapstructure:"skip_clean"`
+	// A list of tags to apply to the resulting imported image.
+	Tags []string `mapstructure:"image_tags"`
+	// The name to be used for the resulting DigitalOcean custom image.
+	Name string `mapstructure:"image_name" required:"true"`
+	// The description to set for the resulting imported image.
+	Description string `mapstructure:"image_description"`
+	// The name of the distribution to set for the resulting imported image.
+	Distribution string `mapstructure:"image_distribution"`
+	// A list of DigitalOcean regions, such as `nyc3`, where the resulting image
+	// will be available for use in creating Droplets.
+	ImageRegions []string `mapstructure:"image_regions" required:"true"`
+	// The length of time in minutes to wait for individual steps in the process
+	// to successfully complete. This includes both importing the image from Spaces
+	// as well as distributing the resulting image to additional regions. If not
+	// specified, this will default to 20.
 	Timeout time.Duration `mapstructure:"timeout"`
 
 	ctx interpolate.Context
@@ -106,6 +140,37 @@ func (p *PostProcessor) Configure(raws ...interface{}) error {
 	}
 	if p.config.APIToken == "" {
 		p.config.APIToken = os.Getenv("DIGITALOCEAN_API_TOKEN")
+	}
+
+	if p.config.HTTPRetryMax == nil {
+		p.config.HTTPRetryMax = godo.PtrTo(5)
+		if max := os.Getenv("DIGITALOCEAN_HTTP_RETRY_MAX"); max != "" {
+			maxInt, err := strconv.Atoi(max)
+			if err != nil {
+				return err
+			}
+			p.config.HTTPRetryMax = godo.PtrTo(maxInt)
+		}
+	}
+	if p.config.HTTPRetryWaitMax == nil {
+		p.config.HTTPRetryWaitMax = godo.PtrTo(30.0)
+		if waitMax := os.Getenv("DIGITALOCEAN_HTTP_RETRY_WAIT_MAX"); waitMax != "" {
+			waitMaxFloat, err := strconv.ParseFloat(waitMax, 64)
+			if err != nil {
+				return err
+			}
+			p.config.HTTPRetryWaitMax = godo.PtrTo(waitMaxFloat)
+		}
+	}
+	if p.config.HTTPRetryWaitMin == nil {
+		p.config.HTTPRetryWaitMin = godo.PtrTo(1.0)
+		if waitMin := os.Getenv("DIGITALOCEAN_HTTP_RETRY_WAIT_MIN"); waitMin != "" {
+			waitMinFloat, err := strconv.ParseFloat(waitMin, 64)
+			if err != nil {
+				return err
+			}
+			p.config.HTTPRetryWaitMin = godo.PtrTo(waitMinFloat)
+		}
 	}
 
 	if p.config.ObjectName == "" {
@@ -203,6 +268,15 @@ func (p *PostProcessor) PostProcess(ctx context.Context, ui packersdk.Ui, artifa
 
 	ua := useragent.String(version.PluginVersion.FormattedVersion())
 	opts := []godo.ClientOpt{godo.SetUserAgent(ua)}
+
+	if *p.config.HTTPRetryMax > 0 {
+		opts = append(opts, godo.WithRetryAndBackoffs(godo.RetryConfig{
+			RetryMax:     *p.config.HTTPRetryMax,
+			RetryWaitMin: p.config.HTTPRetryWaitMin,
+			RetryWaitMax: p.config.HTTPRetryWaitMax,
+			Logger:       log.Default(),
+		}))
+	}
 
 	client, err := godo.New(oauth2.NewClient(context.TODO(), &apiTokenSource{
 		AccessToken: p.config.APIToken,

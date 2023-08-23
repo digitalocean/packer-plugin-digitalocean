@@ -4,6 +4,13 @@
   using a DigitalOcean API compatible service. It can also be specified via
   environment variable DIGITALOCEAN_API_URL.
 
+- `http_retry_max` (\*int) - The maximum number of retries for requests that fail with a 429 or 500-level error.
+  The default value is 5. Set to 0 to disable reties.
+
+- `http_retry_wait_max` (\*float64) - The maximum wait time (in seconds) between failed API requests. Default: 30.0
+
+- `http_retry_wait_min` (\*float64) - The minimum wait time (in seconds) between failed API requests. Default: 1.0
+
 - `private_networking` (bool) - Set to true to enable private networking
   for the droplet being created. This defaults to false, or not enabled.
 

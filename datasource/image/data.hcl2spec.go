@@ -10,13 +10,16 @@ import (
 // FlatConfig is an auto-generated flat version of Config.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatConfig struct {
-	APIToken  *string `mapstructure:"api_token" required:"true" cty:"api_token" hcl:"api_token"`
-	APIURL    *string `mapstructure:"api_url" cty:"api_url" hcl:"api_url"`
-	Name      *string `mapstructure:"name" cty:"name" hcl:"name"`
-	NameRegex *string `mapstructure:"name_regex" cty:"name_regex" hcl:"name_regex"`
-	Type      *string `mapstructure:"type" cty:"type" hcl:"type"`
-	Region    *string `mapstructure:"region" cty:"region" hcl:"region"`
-	Latest    *bool   `mapstructure:"latest" cty:"latest" hcl:"latest"`
+	APIToken         *string  `mapstructure:"api_token" required:"true" cty:"api_token" hcl:"api_token"`
+	APIURL           *string  `mapstructure:"api_url" cty:"api_url" hcl:"api_url"`
+	HTTPRetryMax     *int     `mapstructure:"http_retry_max" required:"false" cty:"http_retry_max" hcl:"http_retry_max"`
+	HTTPRetryWaitMax *float64 `mapstructure:"http_retry_wait_max" required:"false" cty:"http_retry_wait_max" hcl:"http_retry_wait_max"`
+	HTTPRetryWaitMin *float64 `mapstructure:"http_retry_wait_min" required:"false" cty:"http_retry_wait_min" hcl:"http_retry_wait_min"`
+	Name             *string  `mapstructure:"name" cty:"name" hcl:"name"`
+	NameRegex        *string  `mapstructure:"name_regex" cty:"name_regex" hcl:"name_regex"`
+	Type             *string  `mapstructure:"type" cty:"type" hcl:"type"`
+	Region           *string  `mapstructure:"region" cty:"region" hcl:"region"`
+	Latest           *bool    `mapstructure:"latest" cty:"latest" hcl:"latest"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -31,13 +34,16 @@ func (*Config) FlatMapstructure() interface{ HCL2Spec() map[string]hcldec.Spec }
 // The decoded values from this spec will then be applied to a FlatConfig.
 func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
-		"api_token":  &hcldec.AttrSpec{Name: "api_token", Type: cty.String, Required: false},
-		"api_url":    &hcldec.AttrSpec{Name: "api_url", Type: cty.String, Required: false},
-		"name":       &hcldec.AttrSpec{Name: "name", Type: cty.String, Required: false},
-		"name_regex": &hcldec.AttrSpec{Name: "name_regex", Type: cty.String, Required: false},
-		"type":       &hcldec.AttrSpec{Name: "type", Type: cty.String, Required: false},
-		"region":     &hcldec.AttrSpec{Name: "region", Type: cty.String, Required: false},
-		"latest":     &hcldec.AttrSpec{Name: "latest", Type: cty.Bool, Required: false},
+		"api_token":           &hcldec.AttrSpec{Name: "api_token", Type: cty.String, Required: false},
+		"api_url":             &hcldec.AttrSpec{Name: "api_url", Type: cty.String, Required: false},
+		"http_retry_max":      &hcldec.AttrSpec{Name: "http_retry_max", Type: cty.Number, Required: false},
+		"http_retry_wait_max": &hcldec.AttrSpec{Name: "http_retry_wait_max", Type: cty.Number, Required: false},
+		"http_retry_wait_min": &hcldec.AttrSpec{Name: "http_retry_wait_min", Type: cty.Number, Required: false},
+		"name":                &hcldec.AttrSpec{Name: "name", Type: cty.String, Required: false},
+		"name_regex":          &hcldec.AttrSpec{Name: "name_regex", Type: cty.String, Required: false},
+		"type":                &hcldec.AttrSpec{Name: "type", Type: cty.String, Required: false},
+		"region":              &hcldec.AttrSpec{Name: "region", Type: cty.String, Required: false},
+		"latest":              &hcldec.AttrSpec{Name: "latest", Type: cty.Bool, Required: false},
 	}
 	return s
 }
