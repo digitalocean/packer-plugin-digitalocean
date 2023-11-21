@@ -10,25 +10,6 @@ foundation of new servers that are launched within DigitalOcean.
 The builder does _not_ manage images. Once it creates an image, it is up to you
 to use it or delete it.
 
-## Installation
-
-To install this plugin using Packer v1.7.0 or later, copy and paste this code
-into your Packer configuration.
-
-Then, run [`packer init`](https://www.packer.io/docs/commands/init).
-
-
-```hcl
-packer {
-  required_plugins {
-    digitalocean = {
-      version = ">= 1.0.4"
-      source  = "github.com/digitalocean/digitalocean"
-    }
-  }
-}
-```
-
 ## Configuration Reference
 
 There are many configuration options available for the builder. They are
@@ -68,6 +49,13 @@ each category, the available configuration keys are alphabetized.
 - `api_url` (string) - Non standard api endpoint URL. Set this if you are
   using a DigitalOcean API compatible service. It can also be specified via
   environment variable DIGITALOCEAN_API_URL.
+
+- `http_retry_max` (\*int) - The maximum number of retries for requests that fail with a 429 or 500-level error.
+  The default value is 5. Set to 0 to disable reties.
+
+- `http_retry_wait_max` (\*float64) - The maximum wait time (in seconds) between failed API requests. Default: 30.0
+
+- `http_retry_wait_min` (\*float64) - The minimum wait time (in seconds) between failed API requests. Default: 1.0
 
 - `private_networking` (bool) - Set to true to enable private networking
   for the droplet being created. This defaults to false, or not enabled.
@@ -199,6 +187,31 @@ In addition to the builder options, a
   and beginning provisioning.
 
 <!-- End of code generated from the comments of the Config struct in communicator/config.go; -->
+
+
+<!-- Code generated from the comments of the SSHTemporaryKeyPair struct in communicator/config.go; DO NOT EDIT MANUALLY -->
+
+- `temporary_key_pair_type` (string) - `dsa` | `ecdsa` | `ed25519` | `rsa` ( the default )
+  
+  Specifies the type of key to create. The possible values are 'dsa',
+  'ecdsa', 'ed25519', or 'rsa'.
+  
+  NOTE: DSA is deprecated and no longer recognized as secure, please
+  consider other alternatives like RSA or ED25519.
+
+- `temporary_key_pair_bits` (int) - Specifies the number of bits in the key to create. For RSA keys, the
+  minimum size is 1024 bits and the default is 4096 bits. Generally, 3072
+  bits is considered sufficient. DSA keys must be exactly 1024 bits as
+  specified by FIPS 186-2. For ECDSA keys, bits determines the key length
+  by selecting from one of three elliptic curve sizes: 256, 384 or 521
+  bits. Attempting to use bit lengths other than these three values for
+  ECDSA keys will fail. Ed25519 keys have a fixed length and bits will be
+  ignored.
+  
+  NOTE: DSA is deprecated and no longer recognized as secure as specified
+  by FIPS 186-5, please consider other alternatives like RSA or ED25519.
+
+<!-- End of code generated from the comments of the SSHTemporaryKeyPair struct in communicator/config.go; -->
 
 
 <!-- Code generated from the comments of the SSH struct in communicator/config.go; DO NOT EDIT MANUALLY -->
