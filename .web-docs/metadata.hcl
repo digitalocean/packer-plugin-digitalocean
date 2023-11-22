@@ -3,7 +3,7 @@
 integration {
   name = "DigitalOcean"
   description = "TODO"
-  identifier = "packer/BrandonRomano/digitalocean"
+  identifier = "packer/digitalocean/digitalocean"
   component {
     type = "data-source"
     name = "DigitalOcean Image"
