@@ -2,7 +2,7 @@
 # https://github.com/hashicorp/integration-template#metadata-configuration
 integration {
   name = "DigitalOcean"
-  description = "TODO"
+  description = "The DigitalOcean plugin can be used with HashiCorp Packer to create custom images for DigitalOcean."
   identifier = "packer/digitalocean/digitalocean"
   component {
     type = "data-source"
