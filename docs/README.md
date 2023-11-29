@@ -28,12 +28,12 @@ $ packer plugins install github.com/digitalocean/digitalocean
 
 #### Builders
 
-- [digitalocean](/packer/integrations/digitalocean/latest/components/builder/digitalocean) - The builder takes a source image, runs any provisioning necessary on the image after launching it, then snapshots it into a reusable image. This reusable image can then be used as the foundation of new servers that are launched within DigitalOcean.
+- [digitalocean](/packer/integrations/digitalocean/digitalocean/latest/components/builder/digitalocean) - The builder takes a source image, runs any provisioning necessary on the image after launching it, then snapshots it into a reusable image. This reusable image can then be used as the foundation of new servers that are launched within DigitalOcean.
 
 #### Data Sources
 
-- [digitalocean-image](/packer/integrations/digitalocean/latest/components/datasource/image) - The DigitalOcean image data source is used look up the ID of an existing DigitalOcean image for use as a builder source.
+- [digitalocean-image](/packer/integrations/digitalocean/digitalocean/latest/components/datasource/image) - The DigitalOcean image data source is used look up the ID of an existing DigitalOcean image for use as a builder source.
 
 #### Post-processors
 
-- [digitalocean-import](/packer/integrations/digitalocean/latest/components/post-processor/import) -processor](/docs/post-processors/digitalocean-import.mdx) - The digitalocean-import post-processor is used to import images to DigitalOcean
+- [digitalocean-import](/packer/integrations/digitalocean/digitalocean/latest/components/post-processor/import) -processor](/docs/post-processors/digitalocean-import.mdx) - The digitalocean-import post-processor is used to import images to DigitalOcean
