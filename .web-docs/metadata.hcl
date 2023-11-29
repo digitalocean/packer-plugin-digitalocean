@@ -7,7 +7,7 @@ integration {
   component {
     type = "data-source"
     name = "DigitalOcean Image"
-    slug = "digitalocen-image"
+    slug = "image"
   }
   component {
     type = "builder"
@@ -17,6 +17,6 @@ integration {
   component {
     type = "post-processor"
     name = "DigitalOcean Import"
-    slug = "digitalocean-import"
+    slug = "import"
   }
 }
