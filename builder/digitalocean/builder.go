@@ -102,19 +102,24 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	state.Put("hook", hook)
 	state.Put("ui", ui)
 
+	// Only generate the temp key pair if one is not already provided
+	genTempKeyPair := b.config.SSHKeyID == 0 || b.config.Comm.SSHPrivateKeyFile == ""
+
 	// Build the steps
 	steps := []multistep.Step{
-		&communicator.StepSSHKeyGen{
-			CommConf:            &b.config.Comm,
-			SSHTemporaryKeyPair: b.config.Comm.SSH.SSHTemporaryKeyPair,
-		},
+		multistep.If(genTempKeyPair,
+			&communicator.StepSSHKeyGen{
+				CommConf:            &b.config.Comm,
+				SSHTemporaryKeyPair: b.config.Comm.SSH.SSHTemporaryKeyPair,
+			},
+		),
 		multistep.If(b.config.PackerDebug && b.config.Comm.SSHPrivateKeyFile == "",
 			&communicator.StepDumpSSHKey{
 				Path: fmt.Sprintf("do_%s.pem", b.config.PackerBuildName),
 				SSH:  &b.config.Comm.SSH,
 			},
 		),
-		&stepCreateSSHKey{},
+		multistep.If(genTempKeyPair, new(stepCreateSSHKey)),
 		new(stepCreateDroplet),
 		new(stepDropletInfo),
 		&communicator.StepConnect{
@@ -123,9 +128,11 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 			SSHConfig: b.config.Comm.SSHConfigFunc(),
 		},
 		new(commonsteps.StepProvision),
-		&commonsteps.StepCleanupTempKeys{
-			Comm: &b.config.Comm,
-		},
+		multistep.If(genTempKeyPair,
+			&commonsteps.StepCleanupTempKeys{
+				Comm: &b.config.Comm,
+			},
+		),
 		new(stepShutdown),
 		new(stepPowerOff),
 		&stepSnapshot{
