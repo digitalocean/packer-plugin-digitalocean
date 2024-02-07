@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/digitalocean/godo"
@@ -20,6 +21,14 @@ func TestBuilderAcc_basic(t *testing.T) {
 	acctest.TestPlugin(t, &acctest.PluginTestCase{
 		Name:     "test-digitalocean-builder-basic",
 		Template: fmt.Sprintf(testBuilderAccBasic, "ubuntu-20-04-x64"),
+		Check: func(buildCommand *exec.Cmd, logfile string) error {
+			if buildCommand.ProcessState != nil {
+				if buildCommand.ProcessState.ExitCode() != 0 {
+					return fmt.Errorf("Bad exit code. Logfile: %s", logfile)
+				}
+			}
+			return nil
+		},
 	})
 }
 
@@ -30,6 +39,32 @@ func TestBuilderAcc_imageId(t *testing.T) {
 	acctest.TestPlugin(t, &acctest.PluginTestCase{
 		Name:     "test-digitalocean-builder-imageID",
 		Template: makeTemplateWithImageId(t),
+		Check: func(buildCommand *exec.Cmd, logfile string) error {
+			if buildCommand.ProcessState != nil {
+				if buildCommand.ProcessState.ExitCode() != 0 {
+					return fmt.Errorf("Bad exit code. Logfile: %s", logfile)
+				}
+			}
+			return nil
+		},
+	})
+}
+
+func TestBuilderAcc_multiRegion(t *testing.T) {
+	if skip := testAccPreCheck(t); skip == true {
+		return
+	}
+	acctest.TestPlugin(t, &acctest.PluginTestCase{
+		Name:     "test-digitalocean-builder-multi-region",
+		Template: fmt.Sprintf(testBuilderAccMultiRegion, "ubuntu-20-04-x64"),
+		Check: func(buildCommand *exec.Cmd, logfile string) error {
+			if buildCommand.ProcessState != nil {
+				if buildCommand.ProcessState.ExitCode() != 0 {
+					return fmt.Errorf("Bad exit code. Logfile: %s", logfile)
+				}
+			}
+			return nil
+		},
 	})
 }
 
@@ -84,7 +119,8 @@ func makeTemplateWithImageId(t *testing.T) string {
 	return ""
 }
 
-const testBuilderAccBasic = `
+const (
+	testBuilderAccBasic = `
 {
 	"builders": [{
 		"type": "digitalocean",
@@ -97,3 +133,19 @@ const testBuilderAccBasic = `
 	}]
 }
 `
+
+	testBuilderAccMultiRegion = `
+{
+	"builders": [{
+		"type": "digitalocean",
+		"region": "nyc2",
+		"size": "s-1vcpu-1gb",
+		"image": "%v",
+		"ssh_username": "root",
+		"user_data": "",
+		"user_data_file": "",
+		"snapshot_regions": ["nyc2", "nyc3"]
+	}]
+}
+`
+)
