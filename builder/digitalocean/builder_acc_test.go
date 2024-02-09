@@ -144,7 +144,7 @@ const (
 		"ssh_username": "root",
 		"user_data": "",
 		"user_data_file": "",
-		"snapshot_regions": ["nyc2", "nyc3"]
+		"snapshot_regions": ["nyc1", "nyc2", "nyc3"]
 	}]
 }
 `
