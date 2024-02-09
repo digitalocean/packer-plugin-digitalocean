@@ -81,6 +81,7 @@ type FlatConfig struct {
 	IPv6                      *bool             `mapstructure:"ipv6" required:"false" cty:"ipv6" hcl:"ipv6"`
 	SnapshotName              *string           `mapstructure:"snapshot_name" required:"false" cty:"snapshot_name" hcl:"snapshot_name"`
 	SnapshotRegions           []string          `mapstructure:"snapshot_regions" required:"false" cty:"snapshot_regions" hcl:"snapshot_regions"`
+	WaitSnapshotTransfer      *bool             `mapstructure:"wait_snapshot_transfer" required:"false" cty:"wait_snapshot_transfer" hcl:"wait_snapshot_transfer"`
 	StateTimeout              *string           `mapstructure:"state_timeout" required:"false" cty:"state_timeout" hcl:"state_timeout"`
 	SnapshotTimeout           *string           `mapstructure:"snapshot_timeout" required:"false" cty:"snapshot_timeout" hcl:"snapshot_timeout"`
 	DropletName               *string           `mapstructure:"droplet_name" required:"false" cty:"droplet_name" hcl:"droplet_name"`
@@ -175,6 +176,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"ipv6":                         &hcldec.AttrSpec{Name: "ipv6", Type: cty.Bool, Required: false},
 		"snapshot_name":                &hcldec.AttrSpec{Name: "snapshot_name", Type: cty.String, Required: false},
 		"snapshot_regions":             &hcldec.AttrSpec{Name: "snapshot_regions", Type: cty.List(cty.String), Required: false},
+		"wait_snapshot_transfer":       &hcldec.AttrSpec{Name: "wait_snapshot_transfer", Type: cty.Bool, Required: false},
 		"state_timeout":                &hcldec.AttrSpec{Name: "state_timeout", Type: cty.String, Required: false},
 		"snapshot_timeout":             &hcldec.AttrSpec{Name: "snapshot_timeout", Type: cty.String, Required: false},
 		"droplet_name":                 &hcldec.AttrSpec{Name: "droplet_name", Type: cty.String, Required: false},

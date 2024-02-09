@@ -30,8 +30,11 @@
   appear in your account. Defaults to `packer-{{timestamp}}` (see
   configuration templates for more info).
 
-- `snapshot_regions` ([]string) - The regions of the resulting
-  snapshot that will appear in your account.
+- `snapshot_regions` ([]string) - Additional regions that resulting snapshot should be distributed to.
+
+- `wait_snapshot_transfer` (\*bool) - When true, Packer will block until all snapshot transfers have been completed
+  and report errors. When false, Packer will initiate the snapshot transfers
+  and exit successfully without waiting for completion. Defaults to true.
 
 - `state_timeout` (duration string | ex: "1h5m2s") - The time to wait, as a duration string, for a
   droplet to enter a desired state (such as "active") before timing out. The

@@ -14,7 +14,8 @@ import (
 )
 
 type stepSnapshot struct {
-	snapshotTimeout time.Duration
+	snapshotTimeout         time.Duration
+	waitForSnapshotTransfer bool
 }
 
 func (s *stepSnapshot) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
@@ -108,14 +109,16 @@ func (s *stepSnapshot) Run(ctx context.Context, state multistep.StateBag) multis
 					return fmt.Errorf("Error transferring snapshot: %s", err)
 				}
 
-				if err := WaitForImageState(
-					godo.ActionCompleted,
-					imageId,
-					imageTransfer.ID,
-					client, 20*time.Minute); err != nil {
-					return fmt.Errorf("Error waiting for snapshot transfer: %s", err)
+				if s.waitForSnapshotTransfer {
+					if err := WaitForImageState(
+						godo.ActionCompleted,
+						imageId,
+						imageTransfer.ID,
+						client, 20*time.Minute); err != nil {
+						return fmt.Errorf("Error waiting for snapshot transfer: %s", err)
+					}
+					ui.Say(fmt.Sprintf("Transfer to %s is complete.", region))
 				}
-				ui.Say(fmt.Sprintf("Transfer to %s is complete.", region))
 
 				return nil
 			})

@@ -73,9 +73,12 @@ type Config struct {
 	// appear in your account. Defaults to `packer-{{timestamp}}` (see
 	// configuration templates for more info).
 	SnapshotName string `mapstructure:"snapshot_name" required:"false"`
-	// The regions of the resulting
-	// snapshot that will appear in your account.
+	// Additional regions that resulting snapshot should be distributed to.
 	SnapshotRegions []string `mapstructure:"snapshot_regions" required:"false"`
+	// When true, Packer will block until all snapshot transfers have been completed
+	// and report errors. When false, Packer will initiate the snapshot transfers
+	// and exit successfully without waiting for completion. Defaults to true.
+	WaitSnapshotTransfer *bool `mapstructure:"wait_snapshot_transfer" required:"false"`
 	// The time to wait, as a duration string, for a
 	// droplet to enter a desired state (such as "active") before timing out. The
 	// default state timeout is "6m".
@@ -210,6 +213,10 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	if c.SnapshotTimeout == 0 {
 		// Default to 60 minutes timeout, waiting for snapshot action to finish
 		c.SnapshotTimeout = 60 * time.Minute
+	}
+
+	if c.WaitSnapshotTransfer == nil {
+		c.WaitSnapshotTransfer = godo.PtrTo(true)
 	}
 
 	if es := c.Comm.Prepare(&c.ctx); len(es) > 0 {
