@@ -130,9 +130,9 @@ access tokens:
 ```hcl
 source "digitalocean" "example" {
   api_token    = "YOUR API KEY"
-  image        = "ubuntu-16-04-x64"
+  image        = "ubuntu-22-04-x64"
   region       = "nyc3"
-  size         = "512mb"
+  size         = "s-1vcpu-1gb"
   ssh_username = "root"
 }
 
@@ -147,9 +147,9 @@ build {
 {
   "type": "digitalocean",
   "api_token": "YOUR API KEY",
-  "image": "ubuntu-16-04-x64",
+  "image": "ubuntu-22-04-x64",
   "region": "nyc3",
-  "size": "512mb",
+  "size": "s-1vcpu-1gb",
   "ssh_username": "root"
 }
 ```
