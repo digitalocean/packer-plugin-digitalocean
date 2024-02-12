@@ -10,7 +10,7 @@ func testConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"api_token":    "bar",
 		"region":       "nyc2",
-		"size":         "512mb",
+		"size":         "s-1vcpu-1gb",
 		"ssh_username": "root",
 		"image":        "foo",
 	}
