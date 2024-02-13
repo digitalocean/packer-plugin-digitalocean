@@ -87,9 +87,9 @@ type Config struct {
 	// droplet to enter a desired state (such as "active") before timing out. The
 	// default state timeout is "6m".
 	StateTimeout time.Duration `mapstructure:"state_timeout" required:"false"`
-	// How long to wait for an image to be published to the shared image
-	// gallery before timing out. The default snapshot timeout is "60m" (valid time
-	// units include `s` for seconds, `m` for minutes, and `h` for hours).
+	// How long to wait for the Droplet snapshot to complete before timing out.
+	// The default snapshot timeout is "60m" (valid time units include `s` for
+	// seconds, `m` for minutes, and `h` for hours).
 	SnapshotTimeout time.Duration `mapstructure:"snapshot_timeout" required:"false"`
 	// The name assigned to the droplet. DigitalOcean
 	// sets the hostname of the machine to this value.
