@@ -3,8 +3,10 @@ package digitalocean
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"testing"
 
 	"github.com/digitalocean/godo"
@@ -63,6 +65,43 @@ func TestBuilderAcc_multiRegion(t *testing.T) {
 					return fmt.Errorf("Bad exit code. Logfile: %s", logfile)
 				}
 			}
+			return nil
+		},
+	})
+}
+
+func TestBuilderAcc_multiRegionNoWait(t *testing.T) {
+	if skip := testAccPreCheck(t); skip == true {
+		return
+	}
+	acctest.TestPlugin(t, &acctest.PluginTestCase{
+		Name:     "test-digitalocean-builder-multi-region",
+		Template: fmt.Sprintf(testBuilderAccMultiRegionNoWait, "ubuntu-20-04-x64"),
+		Check: func(buildCommand *exec.Cmd, logfile string) error {
+			if buildCommand.ProcessState != nil {
+				if buildCommand.ProcessState.ExitCode() != 0 {
+					return fmt.Errorf("Bad exit code. Logfile: %s", logfile)
+				}
+			}
+
+			logs, err := os.Open(logfile)
+			if err != nil {
+				return fmt.Errorf("Unable find %s", logfile)
+			}
+			defer logs.Close()
+
+			logsBytes, err := io.ReadAll(logs)
+			if err != nil {
+				return fmt.Errorf("Unable to read %s", logfile)
+			}
+			logsString := string(logsBytes)
+
+			notExpected := regexp.MustCompile(`Transfer to .* is complete.`)
+			matches := notExpected.FindStringSubmatch(logsString)
+			if len(matches) > 0 {
+				return fmt.Errorf("logs contains unexpected value: %v", matches)
+			}
+
 			return nil
 		},
 	})
@@ -127,9 +166,7 @@ const (
 		"region": "nyc2",
 		"size": "s-1vcpu-1gb",
 		"image": "%v",
-		"ssh_username": "root",
-		"user_data": "",
-		"user_data_file": ""
+		"ssh_username": "root"
 	}]
 }
 `
@@ -142,9 +179,21 @@ const (
 		"size": "s-1vcpu-1gb",
 		"image": "%v",
 		"ssh_username": "root",
-		"user_data": "",
-		"user_data_file": "",
-		"snapshot_regions": ["nyc2", "nyc3"]
+		"snapshot_regions": ["nyc1", "nyc2", "nyc3"]
+	}]
+}
+`
+
+	testBuilderAccMultiRegionNoWait = `
+{
+	"builders": [{
+		"type": "digitalocean",
+		"region": "nyc2",
+		"size": "s-1vcpu-1gb",
+		"image": "%v",
+		"ssh_username": "root",
+		"snapshot_regions": ["nyc2", "nyc3"],
+		"wait_snapshot_transfer": false
 	}]
 }
 `

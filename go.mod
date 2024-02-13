@@ -10,6 +10,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/zclconf/go-cty v1.13.3
 	golang.org/x/oauth2 v0.1.0
+	golang.org/x/sync v0.4.0
 )
 
 require (

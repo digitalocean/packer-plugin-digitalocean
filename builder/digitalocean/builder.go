@@ -136,7 +136,9 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		new(stepShutdown),
 		new(stepPowerOff),
 		&stepSnapshot{
-			snapshotTimeout: b.config.SnapshotTimeout,
+			snapshotTimeout:         b.config.SnapshotTimeout,
+			transferTimeout:         b.config.TransferTimeout,
+			waitForSnapshotTransfer: *b.config.WaitSnapshotTransfer,
 		},
 	}
 

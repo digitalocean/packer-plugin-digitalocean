@@ -10,10 +10,13 @@ import (
 	"github.com/digitalocean/godo"
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
+	"golang.org/x/sync/errgroup"
 )
 
 type stepSnapshot struct {
-	snapshotTimeout time.Duration
+	snapshotTimeout         time.Duration
+	transferTimeout         time.Duration
+	waitForSnapshotTransfer bool
 }
 
 func (s *stepSnapshot) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
@@ -65,61 +68,72 @@ func (s *stepSnapshot) Run(ctx context.Context, state multistep.StateBag) multis
 		return multistep.ActionHalt
 	}
 
-	if len(c.SnapshotRegions) > 0 {
-		regionSet := make(map[string]struct{})
-		regions := make([]string, 0, len(c.SnapshotRegions))
-		regionSet[c.Region] = struct{}{}
-		for _, region := range c.SnapshotRegions {
-			// If we already saw the region, then don't look again
-			if _, ok := regionSet[region]; ok {
-				continue
-			}
-
-			// Mark that we saw the region
-			regionSet[region] = struct{}{}
-
-			regions = append(regions, region)
-		}
-		snapshotRegions = regions
-
-		for transfer := range snapshotRegions {
-			transferRequest := &godo.ActionRequest{
-				"type":   "transfer",
-				"region": snapshotRegions[transfer],
-			}
-
-			ui.Say(fmt.Sprintf("Transferring snapshot (ID: %d) to %s", images[0].ID, snapshotRegions[transfer]))
-			imageTransfer, _, err := client.ImageActions.Transfer(context.TODO(), images[0].ID, transferRequest)
-			if err != nil {
-				err := fmt.Errorf("Error transferring snapshot: %s", err)
-				state.Put("error", err)
-				ui.Error(err.Error())
-				return multistep.ActionHalt
-			}
-
-			if err := WaitForImageState(godo.ActionCompleted, images[0].ID, imageTransfer.ID,
-				client, 20*time.Minute); err != nil {
-				// If we get an error the first time, actually report it
-				err := fmt.Errorf("Error waiting for snapshot transfer: %s", err)
-				state.Put("error", err)
-				ui.Error(err.Error())
-				return multistep.ActionHalt
-			}
-		}
-	}
-
 	var imageId int
 	if len(images) == 1 {
 		imageId = images[0].ID
+		log.Printf("Snapshot image ID: %d", imageId)
 	} else {
 		err := errors.New("Couldn't find snapshot to get the image ID. Bug?")
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
 	}
+
+	if len(c.SnapshotRegions) > 0 {
+		regionSet := make(map[string]bool)
+		regions := make([]string, 0, len(c.SnapshotRegions))
+		regionSet[c.Region] = true
+		for _, region := range c.SnapshotRegions {
+			// If we already saw the region, then don't look again
+			if regionSet[region] {
+				continue
+			}
+
+			// Mark that we saw the region
+			regionSet[region] = true
+
+			regions = append(regions, region)
+		}
+
+		eg, gCtx := errgroup.WithContext(ctx)
+		for _, r := range regions {
+			region := r
+			eg.Go(func() error {
+				transferRequest := &godo.ActionRequest{
+					"type":   "transfer",
+					"region": region,
+				}
+
+				ui.Say(fmt.Sprintf("Transferring snapshot (ID: %d) to %s...", imageId, region))
+				imageTransfer, _, err := client.ImageActions.Transfer(gCtx, imageId, transferRequest)
+				if err != nil {
+					return fmt.Errorf("Error transferring snapshot: %s", err)
+				}
+
+				if s.waitForSnapshotTransfer {
+					if err := WaitForImageState(
+						godo.ActionCompleted,
+						imageId,
+						imageTransfer.ID,
+						client, s.transferTimeout); err != nil {
+						return fmt.Errorf("Error waiting for snapshot transfer: %s", err)
+					}
+					ui.Say(fmt.Sprintf("Transfer to %s is complete.", region))
+				}
+
+				return nil
+			})
+		}
+
+		if err := eg.Wait(); err != nil {
+			state.Put("error", err)
+			ui.Error(err.Error())
+			return multistep.ActionHalt
+		}
+	}
+
 	snapshotRegions = append(snapshotRegions, c.Region)
 
-	log.Printf("Snapshot image ID: %d", imageId)
 	state.Put("snapshot_image_id", imageId)
 	state.Put("snapshot_name", c.SnapshotName)
 	state.Put("regions", snapshotRegions)

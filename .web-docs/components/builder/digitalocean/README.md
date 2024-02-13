@@ -76,20 +76,23 @@ each category, the available configuration keys are alphabetized.
   appear in your account. Defaults to `packer-{{timestamp}}` (see
   configuration templates for more info).
 
-- `snapshot_regions` ([]string) - The regions of the resulting
-  snapshot that will appear in your account.
+- `snapshot_regions` ([]string) - Additional regions that resulting snapshot should be distributed to.
+
+- `wait_snapshot_transfer` (\*bool) - When true, Packer will block until all snapshot transfers have been completed
+  and report errors. When false, Packer will initiate the snapshot transfers
+  and exit successfully without waiting for completion. Defaults to true.
+
+- `transfer_timeout` (duration string | ex: "1h5m2s") - How long to wait for a snapshot to be transferred to an additional region
+  before timing out. The default transfer timeout is "30m" (valid time units
+  include `s` for seconds, `m` for minutes, and `h` for hours).
 
 - `state_timeout` (duration string | ex: "1h5m2s") - The time to wait, as a duration string, for a
   droplet to enter a desired state (such as "active") before timing out. The
   default state timeout is "6m".
 
-- `snapshot_timeout` (duration string | ex: "1h5m2s") - How long to wait for an image to be published to the shared image
-  gallery before timing out. If your Packer build is failing on the
-  Publishing to Shared Image Gallery step with the error `Original Error:
-  context deadline exceeded`, but the image is present when you check your
-  Azure dashboard, then you probably need to increase this timeout from
-  its default of "60m" (valid time units include `s` for seconds, `m` for
-  minutes, and `h` for hours.)
+- `snapshot_timeout` (duration string | ex: "1h5m2s") - How long to wait for the Droplet snapshot to complete before timing out.
+  The default snapshot timeout is "60m" (valid time units include `s` for
+  seconds, `m` for minutes, and `h` for hours).
 
 - `droplet_name` (string) - The name assigned to the droplet. DigitalOcean
   sets the hostname of the machine to this value.
