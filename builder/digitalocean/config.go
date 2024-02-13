@@ -79,17 +79,17 @@ type Config struct {
 	// and report errors. When false, Packer will initiate the snapshot transfers
 	// and exit successfully without waiting for completion. Defaults to true.
 	WaitSnapshotTransfer *bool `mapstructure:"wait_snapshot_transfer" required:"false"`
+	// How long to wait for a snapshot to be transferred to an additional region
+	// before timing out. The default transfer timeout is "30m" (valid time units
+	// include `s` for seconds, `m` for minutes, and `h` for hours).
+	TransferTimeout time.Duration `mapstructure:"transfer_timeout" required:"false"`
 	// The time to wait, as a duration string, for a
 	// droplet to enter a desired state (such as "active") before timing out. The
 	// default state timeout is "6m".
 	StateTimeout time.Duration `mapstructure:"state_timeout" required:"false"`
 	// How long to wait for an image to be published to the shared image
-	// gallery before timing out. If your Packer build is failing on the
-	// Publishing to Shared Image Gallery step with the error `Original Error:
-	// context deadline exceeded`, but the image is present when you check your
-	// Azure dashboard, then you probably need to increase this timeout from
-	// its default of "60m" (valid time units include `s` for seconds, `m` for
-	// minutes, and `h` for hours.)
+	// gallery before timing out. The default snapshot timeout is "60m" (valid time
+	// units include `s` for seconds, `m` for minutes, and `h` for hours).
 	SnapshotTimeout time.Duration `mapstructure:"snapshot_timeout" required:"false"`
 	// The name assigned to the droplet. DigitalOcean
 	// sets the hostname of the machine to this value.
@@ -213,6 +213,10 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	if c.SnapshotTimeout == 0 {
 		// Default to 60 minutes timeout, waiting for snapshot action to finish
 		c.SnapshotTimeout = 60 * time.Minute
+	}
+
+	if c.TransferTimeout == 0 {
+		c.TransferTimeout = 30 * time.Minute
 	}
 
 	if c.WaitSnapshotTransfer == nil {

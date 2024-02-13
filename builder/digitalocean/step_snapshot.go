@@ -15,6 +15,7 @@ import (
 
 type stepSnapshot struct {
 	snapshotTimeout         time.Duration
+	transferTimeout         time.Duration
 	waitForSnapshotTransfer bool
 }
 
@@ -114,7 +115,7 @@ func (s *stepSnapshot) Run(ctx context.Context, state multistep.StateBag) multis
 						godo.ActionCompleted,
 						imageId,
 						imageTransfer.ID,
-						client, 20*time.Minute); err != nil {
+						client, s.transferTimeout); err != nil {
 						return fmt.Errorf("Error waiting for snapshot transfer: %s", err)
 					}
 					ui.Say(fmt.Sprintf("Transfer to %s is complete.", region))
