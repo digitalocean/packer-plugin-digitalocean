@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/aws/aws-sdk-go v1.44.114
-	github.com/digitalocean/godo v1.109.0
+	github.com/digitalocean/godo v1.110.0
 	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/hashicorp/packer-plugin-sdk v0.5.2
 	github.com/mitchellh/mapstructure v1.5.0
