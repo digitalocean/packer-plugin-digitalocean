@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/aws/aws-sdk-go v1.44.114
-	github.com/digitalocean/godo v1.110.0
+	github.com/digitalocean/godo v1.113.0
 	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/hashicorp/packer-plugin-sdk v0.5.3
 	github.com/mitchellh/mapstructure v1.5.0
@@ -101,7 +101,7 @@ require (
 require (
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/net v0.17.0 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 )
 
 replace github.com/zclconf/go-cty => github.com/nywilken/go-cty v1.13.3 // added by packer-sdc fix as noted in github.com/hashicorp/packer-plugin-sdk/issues/187
