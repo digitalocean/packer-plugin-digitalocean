@@ -43,7 +43,7 @@ check-generate: generate
 	fi
 
 install-golangci-lint:
-	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.56.2
 
 lint: install-golangci-lint
 	@golangci-lint run ./...
