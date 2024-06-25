@@ -32,8 +32,8 @@ $ packer plugins install github.com/digitalocean/digitalocean
 
 #### Data Sources
 
-- [digitalocean-image](/packer/integrations/digitalocean/digitalocean/latest/components/datasource/image) - The DigitalOcean image data source is used look up the ID of an existing DigitalOcean image for use as a builder source.
+- [digitalocean-image](/packer/integrations/digitalocean/digitalocean/latest/components/data-source/digitalocean-image) - The DigitalOcean image data source is used look up the ID of an existing DigitalOcean image for use as a builder source.
 
 #### Post-processors
 
-- [digitalocean-import](/packer/integrations/digitalocean/digitalocean/latest/components/post-processor/import) -processor](/docs/post-processors/digitalocean-import.mdx) - The digitalocean-import post-processor is used to import images to DigitalOcean
+- [digitalocean-import](/packer/integrations/digitalocean/digitalocean/latest/components/post-processor/digitalocean-import) - The digitalocean-import post-processor is used to import images to DigitalOcean
