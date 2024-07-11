@@ -32,6 +32,8 @@
 
 - `snapshot_regions` ([]string) - Additional regions that resulting snapshot should be distributed to.
 
+- `snapshot_tags` ([]string) - Tags to apply to the resulting snapshot.
+
 - `wait_snapshot_transfer` (\*bool) - When true, Packer will block until all snapshot transfers have been completed
   and report errors. When false, Packer will initiate the snapshot transfers
   and exit successfully without waiting for completion. Defaults to true.

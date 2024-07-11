@@ -166,7 +166,8 @@ const (
 		"region": "nyc2",
 		"size": "s-1vcpu-1gb",
 		"image": "%v",
-		"ssh_username": "root"
+		"ssh_username": "root",
+		"tags": ["tag1","tag2"]
 	}]
 }
 `
@@ -179,7 +180,8 @@ const (
 		"size": "s-1vcpu-1gb",
 		"image": "%v",
 		"ssh_username": "root",
-		"snapshot_regions": ["nyc1", "nyc2", "nyc3"]
+		"snapshot_regions": ["nyc1", "nyc2", "nyc3"],
+		"tags": ["tag1","tag2"]
 	}]
 }
 `
@@ -193,6 +195,7 @@ const (
 		"image": "%v",
 		"ssh_username": "root",
 		"snapshot_regions": ["nyc2", "nyc3"],
+		"tags": ["tag1","tag2"],
 		"wait_snapshot_transfer": false
 	}]
 }
