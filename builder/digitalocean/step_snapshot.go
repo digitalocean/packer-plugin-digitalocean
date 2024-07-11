@@ -82,14 +82,14 @@ func (s *stepSnapshot) Run(ctx context.Context, state multistep.StateBag) multis
 
 	if len(c.SnapshotTags) > 0 {
 		for _, tag := range c.SnapshotTags {
-			resp, err = client.Tags.TagResources(context.TODO(), tag, &godo.TagResourcesRequest{Resources: []godo.Resource{{ID: strconv.Itoa(imageId), Type: "image"}}})
+			_, err = client.Tags.TagResources(context.TODO(), tag, &godo.TagResourcesRequest{Resources: []godo.Resource{{ID: strconv.Itoa(imageId), Type: "image"}}})
 			if err != nil {
 				err := fmt.Errorf("Error Tagging Image: %s", err)
 				state.Put("error", err)
 				ui.Error(err.Error())
 				return multistep.ActionHalt
 			}
-			log.Printf("Added snapshot tag: %s", tag)
+			ui.Say(fmt.Sprintf("Added snapshot tag: %s...", tag))
 		}
 	}
 
