@@ -106,6 +106,8 @@ each category, the available configuration keys are alphabetized.
 
 - `tags` ([]string) - Tags to apply to the droplet when it is created
 
+- `snapshot_tags` ([]string) - Tags to apply to the snapshot after it is created
+
 - `vpc_uuid` (string) - UUID of the VPC which the droplet will be created in. Before using this,
   private_networking should be enabled.
 
