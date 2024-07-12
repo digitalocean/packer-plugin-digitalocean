@@ -89,6 +89,7 @@ type FlatConfig struct {
 	UserData                  *string           `mapstructure:"user_data" required:"false" cty:"user_data" hcl:"user_data"`
 	UserDataFile              *string           `mapstructure:"user_data_file" required:"false" cty:"user_data_file" hcl:"user_data_file"`
 	Tags                      []string          `mapstructure:"tags" required:"false" cty:"tags" hcl:"tags"`
+	SnapshotTags              []string          `mapstructure:"snapshot_tags" required:"false" cty:"snapshot_tags" hcl:"snapshot_tags"`
 	VPCUUID                   *string           `mapstructure:"vpc_uuid" required:"false" cty:"vpc_uuid" hcl:"vpc_uuid"`
 	ConnectWithPrivateIP      *bool             `mapstructure:"connect_with_private_ip" required:"false" cty:"connect_with_private_ip" hcl:"connect_with_private_ip"`
 	SSHKeyID                  *int              `mapstructure:"ssh_key_id" required:"false" cty:"ssh_key_id" hcl:"ssh_key_id"`
@@ -185,6 +186,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"user_data":                    &hcldec.AttrSpec{Name: "user_data", Type: cty.String, Required: false},
 		"user_data_file":               &hcldec.AttrSpec{Name: "user_data_file", Type: cty.String, Required: false},
 		"tags":                         &hcldec.AttrSpec{Name: "tags", Type: cty.List(cty.String), Required: false},
+		"snapshot_tags":                &hcldec.AttrSpec{Name: "snapshot_tags", Type: cty.List(cty.String), Required: false},
 		"vpc_uuid":                     &hcldec.AttrSpec{Name: "vpc_uuid", Type: cty.String, Required: false},
 		"connect_with_private_ip":      &hcldec.AttrSpec{Name: "connect_with_private_ip", Type: cty.Bool, Required: false},
 		"ssh_key_id":                   &hcldec.AttrSpec{Name: "ssh_key_id", Type: cty.Number, Required: false},

@@ -103,6 +103,8 @@ type Config struct {
 	UserDataFile string `mapstructure:"user_data_file" required:"false"`
 	// Tags to apply to the droplet when it is created
 	Tags []string `mapstructure:"tags" required:"false"`
+	// Tags to apply to the snapshot after it is created
+	SnapshotTags []string `mapstructure:"snapshot_tags" required:"false"`
 	// UUID of the VPC which the droplet will be created in. Before using this,
 	// private_networking should be enabled.
 	VPCUUID string `mapstructure:"vpc_uuid" required:"false"`
