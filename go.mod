@@ -6,7 +6,7 @@ toolchain go1.22.4
 
 require (
 	github.com/aws/aws-sdk-go v1.44.114
-	github.com/digitalocean/godo v1.122.0
+	github.com/digitalocean/godo v1.124.0
 	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/hashicorp/packer-plugin-sdk v0.5.4
 	github.com/mitchellh/mapstructure v1.5.0
