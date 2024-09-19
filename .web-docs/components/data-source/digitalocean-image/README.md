@@ -56,9 +56,14 @@ for use as a builder source.
 
 ## Example Usage
 
+In this example, we combine `name_regex` and `latest` to find the most recent
+user generated image matching the name `golden-image-.*`. The ID of the found
+image is then passed to the builder where it is used as the base for creating
+a new image.
+
 ```hcl
 data "digitalocean-image" "example" {
-    name_regex = "golden-image-2022.*"
+    name_regex = "golden-image-.*"
     region     = "nyc3"
     type       = "user"
     latest     = true
@@ -69,7 +74,7 @@ locals {
 }
 
 source "digitalocean" "example" {
-    snapshot_name = "updated-golden-image"
+    snapshot_name = "golden-image-{{isotime}}"
     image         = local.image_id
     region        = "nyc3"
     size          = "s-1vcpu-1gb"
