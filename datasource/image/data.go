@@ -256,7 +256,7 @@ func filterImages(c *Config, images []godo.Image) (godo.Image, error) {
 		return godo.Image{}, fmt.Errorf("More than one matching image found: %v", result)
 	}
 	if len(result) == 0 {
-		return godo.Image{}, errors.New("No image matching found")
+		return godo.Image{}, errors.New("No matching image found")
 	}
 
 	return result[0], nil

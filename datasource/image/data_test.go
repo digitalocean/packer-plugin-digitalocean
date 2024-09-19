@@ -58,7 +58,7 @@ func TestFilterImages(t *testing.T) {
 				{ID: 1, Name: "test-image-01", Created: "2022-08-08T21:31:54Z", Regions: []string{"nyc3"}},
 				{ID: 2, Name: "test-image-02", Created: "2022-08-10T21:31:54Z", Regions: []string{"nyc2"}},
 			},
-			expectedError: "No image matching found",
+			expectedError: "No matching image found",
 		},
 
 		{
@@ -104,7 +104,7 @@ func TestFilterImages(t *testing.T) {
 				{ID: 1, Name: "test-image01", Created: "2022-08-08T21:31:54Z", Regions: []string{"nyc3"}},
 				{ID: 2, Name: "test-image02", Created: "2022-08-10T21:31:54Z", Regions: []string{"nyc2"}},
 			},
-			expectedError: "No image matching found",
+			expectedError: "No matching image found",
 		},
 	}
 
