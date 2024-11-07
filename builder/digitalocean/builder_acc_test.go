@@ -11,6 +11,7 @@ import (
 
 	"github.com/digitalocean/godo"
 	"github.com/digitalocean/packer-plugin-digitalocean/version"
+	"github.com/google/uuid"
 	"github.com/hashicorp/packer-plugin-sdk/acctest"
 	"github.com/hashicorp/packer-plugin-sdk/useragent"
 	"golang.org/x/oauth2"
@@ -22,7 +23,7 @@ func TestBuilderAcc_basic(t *testing.T) {
 	}
 	acctest.TestPlugin(t, &acctest.PluginTestCase{
 		Name:     "test-digitalocean-builder-basic",
-		Template: fmt.Sprintf(testBuilderAccBasic, "ubuntu-20-04-x64"),
+		Template: fmt.Sprintf(testBuilderAccBasic, "ubuntu-20-04-x64", uuid.New().String()),
 		Check: func(buildCommand *exec.Cmd, logfile string) error {
 			if buildCommand.ProcessState != nil {
 				if buildCommand.ProcessState.ExitCode() != 0 {
@@ -152,7 +153,7 @@ func makeTemplateWithImageId(t *testing.T) string {
 			t.Fatalf("failed to retrieve image ID: %s", err)
 		}
 
-		return fmt.Sprintf(testBuilderAccBasic, image.ID)
+		return fmt.Sprintf(testBuilderAccBasic, image.ID, uuid.New().String())
 	}
 
 	return ""
@@ -167,7 +168,8 @@ const (
 		"size": "s-1vcpu-1gb",
 		"image": "%v",
 		"ssh_username": "root",
-		"tags": ["tag1","tag2"]
+		"tags": ["tag1","tag2"],
+		"snapshot_tags": ["%s"]
 	}]
 }
 `
