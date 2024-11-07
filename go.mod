@@ -7,6 +7,7 @@ toolchain go1.22.4
 require (
 	github.com/aws/aws-sdk-go v1.44.114
 	github.com/digitalocean/godo v1.122.0
+	github.com/google/uuid v1.4.0
 	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/hashicorp/packer-plugin-sdk v0.5.4
 	github.com/mitchellh/mapstructure v1.5.0
@@ -39,7 +40,6 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
-	github.com/google/uuid v1.4.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/hashicorp/consul/api v1.25.1 // indirect
