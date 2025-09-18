@@ -116,6 +116,8 @@ type Config struct {
 	// The ID of an existing SSH key on the DigitalOcean account. This should be
 	// used in conjunction with `ssh_private_key_file`.
 	SSHKeyID int `mapstructure:"ssh_key_id" required:"false"`
+	// The Project ID to launch the droplet in.
+	ProjectID string `mapstructure:"project_id" required:"false"`
 
 	ctx interpolate.Context
 }

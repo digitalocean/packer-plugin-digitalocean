@@ -28,6 +28,7 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	state.Put("droplet_size", c.Size)
 	state.Put("droplet_name", c.DropletName)
 	state.Put("build_region", c.Region)
+	state.Put("project_id", c.ProjectID)
 
 	// Create the droplet based on configuration
 	ui.Say("Creating droplet...")
@@ -100,6 +101,7 @@ func (s *stepCreateDroplet) buildDropletCreateRequest(state multistep.StateBag) 
 		UserData:          userData,
 		Tags:              c.Tags,
 		VPCUUID:           c.VPCUUID,
+		ProjectID:         c.ProjectID,
 	}, nil
 }
 
