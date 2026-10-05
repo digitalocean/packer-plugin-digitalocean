@@ -42,7 +42,8 @@ func (s *stepCreateSSHKey) Run(ctx context.Context, state multistep.StateBag) mu
 		return multistep.ActionHalt
 	}
 
-	// We use this to check cleanup
+	// Set this immediately so cleanup can delete the key even if a later
+	// wait or droplet create fails.
 	s.keyId = key.ID
 
 	log.Printf("temporary ssh key name: %s", name)
@@ -61,9 +62,20 @@ func (s *stepCreateSSHKey) Cleanup(state multistep.StateBag) {
 
 	client := state.Get("client").(*godo.Client)
 	ui := state.Get("ui").(packersdk.Ui)
+	c := state.Get("config").(*Config)
 
 	ui.Say("Deleting temporary ssh key...")
-	_, err := client.Keys.DeleteByID(context.TODO(), s.keyId)
+	err := retryWithBackoff(
+		context.Background(),
+		c.StateTimeout,
+		defaultRetryInitial,
+		defaultRetryMaxBackoff,
+		isNotFoundError,
+		func() error {
+			_, err := client.Keys.DeleteByID(context.TODO(), s.keyId)
+			return err
+		},
+	)
 	if err != nil {
 		log.Printf("Error cleaning up ssh key: %s", err)
 		ui.Error(fmt.Sprintf(

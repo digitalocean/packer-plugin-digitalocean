@@ -85,7 +85,9 @@ type Config struct {
 	TransferTimeout time.Duration `mapstructure:"transfer_timeout" required:"false"`
 	// The time to wait, as a duration string, for a
 	// droplet to enter a desired state (such as "active") before timing out. The
-	// default state timeout is "6m".
+	// default state timeout is "6m". This timeout is also used when retrying
+	// droplet create after a newly created SSH key is not yet visible, waiting
+	// for an IPv4 address, and retrying temporary SSH key deletion.
 	StateTimeout time.Duration `mapstructure:"state_timeout" required:"false"`
 	// How long to wait for the Droplet snapshot to complete before timing out.
 	// The default snapshot timeout is "60m" (valid time units include `s` for
