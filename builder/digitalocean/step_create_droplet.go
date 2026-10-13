@@ -39,7 +39,24 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 
 	log.Printf("[DEBUG] Droplet create parameters: %s", godo.Stringify(dropletCreateReq))
 
-	droplet, _, err := client.Droplets.Create(context.TODO(), dropletCreateReq)
+	var droplet *godo.Droplet
+	retried := false
+	err = retryWithBackoff(
+		ctx,
+		defaultRetryTimeout,
+		defaultRetryInitial,
+		defaultRetryMaxBackoff,
+		isInvalidSSHKeyError,
+		func() error {
+			var createErr error
+			droplet, _, createErr = client.Droplets.Create(ctx, dropletCreateReq)
+			if isInvalidSSHKeyError(createErr) && !retried {
+				ui.Say("SSH key not yet available for droplet create; retrying with backoff...")
+				retried = true
+			}
+			return createErr
+		},
+	)
 	if err != nil {
 		err := fmt.Errorf("Error creating droplet: %s", err)
 		state.Put("error", err)

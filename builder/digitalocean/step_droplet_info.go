@@ -2,6 +2,7 @@ package digitalocean
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/digitalocean/godo"
@@ -27,37 +28,30 @@ func (s *stepDropletInfo) Run(ctx context.Context, state multistep.StateBag) mul
 		return multistep.ActionHalt
 	}
 
-	// Set the IP on the state for later
-	droplet, _, err := client.Droplets.Get(context.TODO(), dropletID)
+	ui.Say("Waiting for droplet IPv4 address...")
+	err = retryWithBackoff(
+		ctx,
+		defaultRetryTimeout,
+		defaultRetryInitial,
+		defaultRetryMaxBackoff,
+		func(err error) bool {
+			return errors.Is(err, errIPv4NotFound) || isNotFoundError(err)
+		},
+		func() error {
+			droplet, _, getErr := client.Droplets.Get(ctx, dropletID)
+			if getErr != nil {
+				return getErr
+			}
+			ip, ipErr := dropletIPv4(droplet, c.ConnectWithPrivateIP)
+			if ipErr != nil {
+				return ipErr
+			}
+			state.Put("droplet_ip", ip)
+			return nil
+		},
+	)
 	if err != nil {
-		err := fmt.Errorf("Error retrieving droplet: %s", err)
-		state.Put("error", err)
-		ui.Error(err.Error())
-		return multistep.ActionHalt
-	}
-
-	// Verify we have an IPv4 address
-	invalid := droplet.Networks == nil ||
-		len(droplet.Networks.V4) == 0
-	if invalid {
-		err := fmt.Errorf("IPv4 address not found for droplet")
-		state.Put("error", err)
-		ui.Error(err.Error())
-		return multistep.ActionHalt
-	}
-
-	// Find the ip address which will be used by communicator
-	foundNetwork := false
-	for _, network := range droplet.Networks.V4 {
-		if (c.ConnectWithPrivateIP && network.Type == "private") ||
-			(!(c.ConnectWithPrivateIP) && network.Type == "public") {
-			state.Put("droplet_ip", network.IPAddress)
-			foundNetwork = true
-			break
-		}
-	}
-	if !foundNetwork {
-		err := fmt.Errorf("Count not find a public IPv4 address for this droplet")
+		err := fmt.Errorf("Error retrieving droplet IPv4 address: %s", err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
