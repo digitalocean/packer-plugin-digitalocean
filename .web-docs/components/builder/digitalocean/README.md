@@ -88,9 +88,7 @@ each category, the available configuration keys are alphabetized.
 
 - `state_timeout` (duration string | ex: "1h5m2s") - The time to wait, as a duration string, for a
   droplet to enter a desired state (such as "active") before timing out. The
-  default state timeout is "6m". This timeout is also used when retrying
-  droplet create after a newly created SSH key is not yet visible, waiting
-  for an IPv4 address, and retrying temporary SSH key deletion.
+  default state timeout is "6m".
 
 - `snapshot_timeout` (duration string | ex: "1h5m2s") - How long to wait for the Droplet snapshot to complete before timing out.
   The default snapshot timeout is "60m" (valid time units include `s` for
