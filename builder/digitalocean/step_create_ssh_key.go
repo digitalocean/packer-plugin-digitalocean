@@ -62,12 +62,11 @@ func (s *stepCreateSSHKey) Cleanup(state multistep.StateBag) {
 
 	client := state.Get("client").(*godo.Client)
 	ui := state.Get("ui").(packersdk.Ui)
-	c := state.Get("config").(*Config)
 
 	ui.Say("Deleting temporary ssh key...")
 	err := retryWithBackoff(
 		context.Background(),
-		c.StateTimeout,
+		defaultRetryTimeout,
 		defaultRetryInitial,
 		defaultRetryMaxBackoff,
 		isNotFoundError,

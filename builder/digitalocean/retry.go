@@ -15,6 +15,7 @@ import (
 const (
 	defaultRetryInitial    = 1 * time.Second
 	defaultRetryMaxBackoff = 15 * time.Second
+	defaultRetryTimeout    = 1 * time.Minute
 )
 
 var errIPv4NotFound = errors.New("IPv4 address not found for droplet")
@@ -37,7 +38,7 @@ func retryWithBackoff(
 	fn func() error,
 ) error {
 	if timeout <= 0 {
-		timeout = 6 * time.Minute
+		timeout = defaultRetryTimeout
 	}
 	if initial <= 0 {
 		initial = defaultRetryInitial

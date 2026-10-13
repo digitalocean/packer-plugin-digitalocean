@@ -43,7 +43,7 @@ func (s *stepCreateDroplet) Run(ctx context.Context, state multistep.StateBag) m
 	retried := false
 	err = retryWithBackoff(
 		ctx,
-		c.StateTimeout,
+		defaultRetryTimeout,
 		defaultRetryInitial,
 		defaultRetryMaxBackoff,
 		isInvalidSSHKeyError,

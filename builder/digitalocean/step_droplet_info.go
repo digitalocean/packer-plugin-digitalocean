@@ -31,7 +31,7 @@ func (s *stepDropletInfo) Run(ctx context.Context, state multistep.StateBag) mul
 	ui.Say("Waiting for droplet IPv4 address...")
 	err = retryWithBackoff(
 		ctx,
-		c.StateTimeout,
+		defaultRetryTimeout,
 		defaultRetryInitial,
 		defaultRetryMaxBackoff,
 		func(err error) bool {
